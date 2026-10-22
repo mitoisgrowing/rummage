@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Rummage</title>
 <style>
-:root{--bg:#1e1e1e;--pn:#2a2a2a;--pn2:#323232;--ln:#3d3d3d;--ln2:#161616;--tile:#3a3a3a;--t:#e4e4e4;--m:#9a9a9a;--sel:#1f2fb8;--blue:#4f8cff;--org:#f0902c;--rh:27px}
+:root{--bg:#1e1e1e;--pn:#2a2a2a;--pn2:#323232;--ln:#3d3d3d;--ln2:#161616;--tile:#3a3a3a;--t:#e4e4e4;--m:#9a9a9a;--sel:#1f2fb8;--blue:var(--blue);--org:#f0902c;--rh:27px}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--t);font:11px/1.25 Arial,"Segoe UI",sans-serif;display:grid;grid-template-columns:auto 1fr;grid-template-rows:32px 1fr 22px;overflow:hidden;user-select:none}
 svg{display:block;flex:none}
 button,select,input{font:inherit;color:var(--t)}
 button{background:var(--tile);border:1px solid #4a4a4a;border-radius:2px;padding:2px 7px;cursor:pointer}
-button:hover{background:#454545}button.on{background:var(--sel);border-color:#3a4ad0;color:#fff}
+button:hover{background:#454545}button.on{background:var(--sel);border-color:color-mix(in srgb,var(--sel) 80%,#fff);color:#fff}
 select{background:#202020;border:1px solid var(--ln);border-radius:2px;padding:1px 2px}
 input{background:#1a1a1a;border:1px solid var(--ln);border-radius:2px;padding:3px 6px;outline:none}input:focus{border-color:var(--blue)}
 ::-webkit-scrollbar{width:9px}::-webkit-scrollbar-track{background:#202020}::-webkit-scrollbar-thumb{background:#4a4a4a;border:2px solid #202020}
@@ -27,7 +27,7 @@ header .knob{flex:none}
 .knob i{position:absolute;left:50%;top:2px;width:2px;height:9px;margin-left:-1px;background:#d8d8d8;transform-origin:50% 10px}
 .knob.sm{width:18px;height:18px}.knob.sm i{height:6px;transform-origin:50% 7px}
 /* rail */
-#rail{width:52px;background:#262626;border-right:1px solid var(--ln2);display:flex;flex-direction:column;min-height:0;grid-row:2/3}
+#rail{width:52px;background:color-mix(in srgb,var(--pn) 88%,#000);border-right:1px solid var(--ln2);display:flex;flex-direction:column;min-height:0;grid-row:2/3}
 #rail.col{width:0;overflow:hidden;border:0}
 #rmid{flex:1;overflow:auto;padding:3px 0}#rmid::-webkit-scrollbar{width:0}
 .rb{display:flex;flex-direction:column;align-items:center;gap:1px;margin:4px auto 6px;width:48px;cursor:pointer;color:var(--m);font-size:8px;text-align:center}
@@ -44,10 +44,10 @@ header .knob{flex:none}
 /* main */
 main{display:flex;flex-direction:column;min-height:0;min-width:0;grid-row:2/3}
 .chips{display:flex;gap:4px;padding:4px 6px;align-items:center;background:var(--pn);border-bottom:1px solid var(--ln2)}
-.chips button{flex:1;font-size:10px;padding:1px 4px;background:#3b3b3b}
+.chips button{flex:1;font-size:10px;padding:1px 4px;background:var(--tile)}
 #zoom{width:64px;-webkit-appearance:none;height:12px;background:none}
 #zoom::-webkit-slider-runnable-track{height:3px;background:#555}#zoom::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:11px;margin-top:-4px;background:#cfcfcf;border-radius:1px}
-.hd{display:flex;padding:2px 8px;color:#a5a5a5;font-size:10px;background:#252525;border-bottom:1px solid var(--ln2)}.hd .n{flex:1}
+.hd{display:flex;padding:2px 8px;color:#a5a5a5;font-size:10px;background:color-mix(in srgb,var(--pn) 85%,#000);border-bottom:1px solid var(--ln2)}.hd .n{flex:1}
 #list{flex:1;overflow:auto;position:relative}
 .r{display:flex;align-items:center;gap:5px;height:var(--rh);padding:0 6px 0 calc(var(--ind)*14px + 6px);cursor:default;border-bottom:1px solid rgba(0,0,0,.35);background:color-mix(in srgb,var(--fc,transparent) 22%,transparent)}
 .r:hover{background-color:rgba(255,255,255,.06)}
@@ -57,16 +57,16 @@ main{display:flex;flex-direction:column;min-height:0;min-width:0;grid-row:2/3}
 .r .tg{width:74px;color:#bdbdbd;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .r .c{width:42px;text-align:right;color:#c9c9c9;font-size:11px;font-weight:700;text-shadow:0 1px 2px #000}
 .chev{width:10px;color:#bbb;font-size:12px;text-align:center;transition:none}.chev.o{transform:rotate(90deg)}
-.dash{width:12px;height:12px;display:grid;place-items:center;cursor:pointer;flex:none}.dash i{width:10px;height:2px;background:#4a90e8;display:block}.dash b{color:#f5c542;font-size:11px}
+.dash{width:14px;height:14px;display:grid;place-items:center;cursor:pointer;flex:none;opacity:.55}.dash:hover,.dash.on{opacity:1}.dash i{width:10px;height:2px;background:#4a90e8;display:block}.dash b{color:#f5c542;font-size:11px}
 .th{width:62px;height:calc(var(--rh) - 10px);display:block;background:rgba(0,0,0,.35);flex:none}
 .bd{width:62px;font-size:9px;text-align:center;padding:1px 0;background:#3c3c3c;color:#cfcfcf;font-weight:700;border:1px solid #4d4d4d;flex:none}
 .bd.Waves{color:#7fc8f0}.bd.Live{color:#f0b36a}.bd.VST3{color:#b9a6f0}.bd.VST2{color:#d9b98a}.bd.chain,.bd.preset{color:#9be0b0}.bd.track{color:#f0a0c8}
-#split{height:4px;cursor:row-resize;background:#151515;border-top:1px solid #3a3a3a}#split:hover{background:#3a4ad0}
+#split{height:4px;cursor:row-resize;background:#151515;border-top:1px solid #3a3a3a}#split:hover{background:color-mix(in srgb,var(--sel) 80%,#fff)}
 /* preview panel: fixed grid so nothing overlaps */
 #det{background:var(--pn);display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:22px minmax(64px,1fr) 22px 40px;gap:5px;padding:5px 7px 6px;overflow:hidden;min-height:170px}
 #det.empty{display:grid;place-items:center;grid-template-rows:1fr;color:var(--m)}
 .dh{display:flex;align-items:center;gap:6px;min-width:0}.dh b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.ext{font-size:10px;color:#9a9a9a;font-weight:700;flex:none}.sp{flex:1}
-.ob{width:22px;height:20px;padding:0;display:grid;place-items:center;border:1px solid #3e63c9;background:#25293a;color:#7aa2ff;flex:none}.ob:hover{background:#2f3550}.ob.on{background:var(--sel);color:#fff}
+.ob{width:22px;height:20px;padding:0;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--blue) 70%,#000);background:color-mix(in srgb,var(--blue) 14%,var(--pn));color:var(--blue);flex:none}.ob:hover{background:#2f3550}.ob.on{background:var(--sel);color:#fff}
 .dw{display:grid;grid-template-columns:1fr 62px;gap:5px;min-height:0}
 .gcol{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;color:#aaa;min-height:0}
 .lbl{font-size:8px;color:#999;margin-top:2px}
@@ -74,31 +74,31 @@ main{display:flex;flex-direction:column;min-height:0;min-width:0;grid-row:2/3}
 .hs::-webkit-slider-runnable-track{height:2px;background:#555}.hs::-webkit-slider-thumb{-webkit-appearance:none;width:6px;height:8px;margin-top:-3px;background:#cfcfcf}
 .tb.wide{flex:0 1 58px;flex-direction:row;gap:5px;font-size:10px;border-color:#5a5a5a}
 .tempo{display:flex;align-items:center;gap:4px;font-size:9px;color:#888;padding:0 4px}.tempo b{color:#ddd;font-weight:400}
-.wv{position:relative;background:#121212;border:1px solid #3c3c3c;min-height:0}
+.wv{position:relative;background:color-mix(in srgb,var(--bg) 60%,#000);border:1px solid #3c3c3c;min-height:0}
 #wave{width:100%;height:100%;display:block;cursor:pointer}
 #time{position:absolute;top:2px;left:50%;transform:translateX(-50%);font-size:10px;color:#ddd;text-shadow:0 1px 2px #000;pointer-events:none}
 .hintb{position:absolute;left:4px;right:4px;bottom:4px;background:rgba(40,40,40,.95);border:1px solid #555;color:#bbb;padding:3px 6px;font-size:10px;display:none;pointer-events:none}.wv:hover .hintb{display:block}
 .ctl{display:grid;grid-template-columns:16px 1fr;gap:3px;min-height:0;overflow:hidden}
 #gain{writing-mode:vertical-lr;direction:rtl;width:14px;flex:1;min-height:0;-webkit-appearance:none;background:none;margin:0}
-#gain::-webkit-slider-runnable-track{width:4px;background:#151515;border:1px solid #444}#gain::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:9px;background:#4f8cff;margin-left:-5px;border:1px solid #9fc0ff}
+#gain::-webkit-slider-runnable-track{width:4px;background:#151515;border:1px solid #444}#gain::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:9px;background:var(--blue);margin-left:-5px;border:1px solid #9fc0ff}
 .kn{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:9px;color:#aaa;overflow:hidden}.kn b{color:#ddd;font-weight:400}
 .trow{display:flex;gap:4px;align-items:center;min-width:0;overflow:hidden}.trow input{width:120px;flex:none;padding:2px 5px;font-size:10px}
 .at{color:#9a9a9a;font-style:italic;font-size:10px;white-space:nowrap}.ut{color:#e4c070;font-size:10px;white-space:nowrap;cursor:pointer}.ut:hover{text-decoration:line-through}
 .tools{display:flex;gap:3px;align-items:stretch;min-width:0;overflow:hidden}
 .tb span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tb{flex:0 1 44px;min-width:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;padding:2px 0;background:#353535;color:#cfcfcf}
-.tb.on{background:var(--sel)}#save{border-color:#3e63c9;color:#7aa2ff;background:#25293a;flex:0 0 40px}
+.tb.on{background:var(--sel)}#save{border-color:color-mix(in srgb,var(--blue) 70%,#000);color:var(--blue);background:color-mix(in srgb,var(--blue) 14%,var(--pn));flex:0 0 40px}
 .tempo{flex:none}
 #drag{cursor:grab}
 .pinfo{display:flex;gap:8px;align-items:center;min-height:0;background:#1d1d1d;border:1px solid #3a3a3a;padding:6px}.pinfo .big{width:44px;height:44px;display:grid;place-items:center;background:#2c2c2c;border:1px solid #444;flex:none}
 .meta{color:var(--m);font-size:10px;word-break:break-all}
 .empty{padding:24px 12px;text-align:center;color:var(--m)}
 /* status bar */
-footer{grid-column:1/3;display:flex;align-items:center;gap:8px;padding:0 4px;background:#232323;border-top:1px solid var(--ln2);font-size:10px;color:#9a9a9a}
+footer{grid-column:1/3;display:flex;align-items:center;gap:8px;padding:0 4px;background:var(--pn);border-top:1px solid var(--ln2);font-size:10px;color:#9a9a9a}
 #sync{padding:1px 6px;border:1px solid #1d8a84;background:#0f3634;color:#53d8cc;font-weight:700;white-space:nowrap}#sync.off{border-color:#2a6f6b;color:#4fbfb5}
 #st{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* menu + config */
-#menu,#cfg{position:fixed;display:none;z-index:20;background:#2c2c2c;border:1px solid #505050;border-radius:2px;padding:3px 0;box-shadow:0 4px 14px rgba(0,0,0,.6);width:200px;font-size:11px}
+#menu,#cfg{position:fixed;display:none;z-index:20;background:var(--pn);border:1px solid var(--ln);border-radius:2px;padding:3px 0;box-shadow:0 4px 14px rgba(0,0,0,.6);width:200px;font-size:11px}
 #menu a{display:flex;justify-content:space-between;padding:3px 10px;cursor:pointer;color:#ddd;position:relative}#menu a:hover{background:#3d3d3d}
 #menu .mt{padding:3px 10px;color:#ddd}#menu hr,#cfg hr{border:0;border-top:1px solid #444;margin:3px 0}
 #menu input{width:calc(100% - 16px);margin:3px 8px;font-size:10px}
@@ -106,8 +106,22 @@ footer{grid-column:1/3;display:flex;align-items:center;gap:8px;padding:0 4px;bac
 .sw{display:flex;gap:3px;padding:3px 10px;flex-wrap:wrap}.sw i{width:13px;height:13px;cursor:pointer;font-style:normal;font-size:9px;display:grid;place-items:center;border:1px solid #666;color:#ccc}.sw i:hover{border-color:#fff}
 .ig{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:4px 10px}.ig i{height:22px;display:grid;place-items:center;cursor:pointer;background:#1f1f1f;border:1px solid #3c3c3c}.ig i:hover{border-color:#aaa}
 #cfg{width:250px;left:56px;bottom:26px;padding:8px 10px;color:#aaa}#cfg b{color:#ddd}#cfg label{display:flex;justify-content:space-between;align-items:center;margin:5px 0;color:#ddd}#cfg input[type=range]{width:110px}
+#cfg{max-height:78vh;overflow:auto}#cfg a{color:var(--blue);cursor:pointer}#cfg .lh{display:flex;justify-content:space-between;margin:7px 0 2px;color:#ddd;font-weight:700}#cfg .lh b{cursor:pointer;color:#888}#cfg .f span{cursor:pointer}#cfg .f span:hover{color:#ddd}.seg{display:flex;gap:4px;margin:5px 0}.seg button{flex:1}
 #cfg .f{display:flex;justify-content:space-between;gap:6px;word-break:break-all;margin:2px 0;font-size:10px}#cfg .f b{color:var(--org);cursor:pointer}
+body.h-chips .chips,body.h-hd .hd,body.h-tags .r .tg,body.h-count .r .c,body.h-thumbs .th,body.h-tools .tools,body.h-autotags .at,body.h-status footer{display:none}
+body.h-status{grid-template-rows:32px 1fr 0}body.h-tools #det{grid-template-rows:22px minmax(64px,1fr) 22px}
+.swr{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}.swr i{width:18px;height:18px;border-radius:3px;cursor:pointer;border:2px solid transparent}.swr i.on{border-color:#fff}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.tgrid label{margin:3px 0!important;font-size:11px}
+#cfg{left:52px!important;top:32px!important;right:0;bottom:22px!important;width:auto!important;max-height:none!important;border-radius:0!important;border:0!important;border-left:1px solid #3d3d3d!important;box-shadow:none!important;padding:0!important;background:var(--pn)!important}
+.ctabs{display:flex;border-bottom:1px solid var(--ln);position:sticky;top:0;background:var(--pn);z-index:1}
+.ctabs button{flex:1;border:0;border-radius:0;background:none;color:#999;padding:10px 0;font-weight:700;font-size:11px}.ctabs button:hover{background:none;color:#ddd}.ctabs button.on{color:#fff;box-shadow:inset 0 -2px 0 var(--blue);background:none}.ctabs #cclose{flex:none;width:36px}
+.cbody{padding:4px 16px 16px}.sec{font-size:9px;letter-spacing:.14em;color:#888;font-weight:700;margin:16px 0 8px}
+.crow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0;color:#ddd}.crow input[type=range]{width:150px}
+.themes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.themes i{display:block;height:30px;border-radius:5px;border:2px solid #444;cursor:pointer}.themes i.on{border-color:var(--blue)}.themes span{display:block;text-align:center;font-size:9px;color:#999;margin-top:3px}
+.dots{display:flex;gap:10px;flex-wrap:wrap}.dots i{width:20px;height:20px;border-radius:50%;cursor:pointer;outline:2px solid transparent;outline-offset:2px}.dots i.on{outline-color:#fff}
+.tg2{width:28px;height:15px;border-radius:8px;background:#4a4a4a;position:relative;cursor:pointer;flex:none}.tg2::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:#ddd;transition:left .15s}.tg2.on{background:var(--blue)}.tg2.on::after{left:15px}
 #dropov{position:fixed;inset:0;z-index:30;display:none;place-items:center;background:rgba(31,47,184,.25);font-size:14px;font-weight:700;border:2px dashed var(--blue);pointer-events:none}
+input[type=range]{accent-color:var(--blue)}.sub .subm{background:var(--pn)!important}
 </style></head><body>
 <div id="bg"></div><div id="shade"></div>
 <header id="header"><span class="ib" id="logo"></span><span class="ib" id="railb" title="Show/hide sidebar"></span><span class="ib" id="back"></span><span class="ib" id="fwd"></span>
@@ -115,13 +129,13 @@ footer{grid-column:1/3;display:flex;align-items:center;gap:8px;padding:0 4px;bac
 <span class="ib" id="spk"></span><div class="knob" data-k="vol" title="Volume"><i></i></div></header>
 <nav id="rail"><div class="collapse" id="colb">‹</div><div id="rmid"></div><div id="rbot"></div></nav>
 <main>
-  <div class="chips"><button id="hidb">hidden</button><button id="tagb">tags</button><button id="foldb">folders</button><input type="range" id="zoom" min="20" max="40" title="Row height"></div>
+  <div class="chips"><button id="hidb">hidden</button><button id="tagb">tags</button><button id="foldb">folders</button><button id="orgb" title="Sort every sample by type">by type</button><input type="range" id="zoom" min="20" max="40" title="Row height"></div>
   <div class="hd"><span class="n" id="sortb" style="cursor:pointer" title="change sort order">name ▾</span><span style="width:74px">tags</span><span style="width:42px;text-align:right">files</span></div>
   <div id="list"></div>
   <div id="split"></div>
   <div id="det"></div>
 </main>
-<footer><span id="sync" class="off">SYNC · waiting for Ableton</span><span id="st"></span><span>Rummage v1.0.0</span></footer>
+<footer><span id="sync" class="off">SYNC · waiting for Ableton</span><span id="st"></span><span>Rummage v1.1.0</span></footer>
 <div id="menu"></div><div id="cfg"></div><div id="dropov">Drop here to save it to My Library</div>
 <script>
 /* ---------- icons (hand-made, 16x16 line art) ---------- */
@@ -149,10 +163,11 @@ const P={
  util:'<path d="M3 13 10 6M9.5 2.5a3 3 0 0 0 4 4l-2-2z"/>',other:'<rect x="2.5" y="2.5" width="11" height="11"/>',
  all:'<path d="M2 7v2M5 4v8M8 2v12M11 5v6M14 7v2"/>',plugins:'<rect x="1.5" y="3" width="13" height="10"/><path d="M1.5 6h13M4.5 9h7"/>',presets:'<circle cx="8" cy="8.5" r="5.5"/><path d="M8 2v6"/>',
  projects:'<rect x="2" y="2.5" width="12" height="4.5"/><rect x="2" y="9" width="12" height="4.5"/>',splice:'<path d="M4.5 12.5a3 3 0 0 1-.4-6 4.5 4.5 0 0 1 8.6.8 2.6 2.6 0 0 1-.2 5.2z"/><path d="M8 7.5v4M6.3 9.8 8 11.5l1.7-1.7"/>',
+ dock:'<rect x="1.5" y="2.5" width="5" height="11"/><rect x="8.5" y="2.5" width="6" height="11"/>',
  recent:'<circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/>',
  star:'<path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z"/>',plus:'<path d="M8 3v10M3 8h10"/>',crate:'<path d="M3 8h10"/>',
  addf:'<path d="M1.5 4.5V13h13V5.5H7.5L6 3.5H1.5z"/><path d="M8 7v4M6 9h4"/>',img:'<rect x="1.5" y="2.5" width="13" height="11"/><path d="M1.5 11l4-4 3 3 2-2 4 4"/><circle cx="11" cy="5.5" r="1"/>',
- panel:'<rect x="1.5" y="2" width="13" height="12"/><path d="M1.5 10h13"/>',pin:'<path d="M6 2h4l-.5 4 2.5 2.5H4L6.5 6z"/><path d="M8 8.5V14"/>',gear:'<circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/>',
+ panel:'<rect x="1.5" y="2" width="13" height="12"/><path d="M1.5 10h13"/>',pin:'<path d="M6 2h4l-.5 4 2.5 2.5H4L6.5 6z"/><path d="M8 8.5V14"/>',gear:'<path d="M6.8 1.5h2.4l.4 1.9 1.2.5 1.6-1.1 1.7 1.7-1.1 1.6.5 1.2 1.9.4v2.4l-1.9.4-.5 1.2 1.1 1.6-1.7 1.7-1.6-1.1-1.2.5-.4 1.9H6.8l-.4-1.9-1.2-.5-1.6 1.1-1.7-1.7 1.1-1.6-.5-1.2-1.9-.4V6.8l1.9-.4.5-1.2-1.1-1.6 1.7-1.7 1.6 1.1 1.2-.5z"/><circle cx="8" cy="8" r="2.3"/>',
  search:'<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/>',back:'<path d="M10 3 5 8l5 5"/>',fwd:'<path d="M6 3l5 5-5 5"/>',grid:'<rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/>',
  speaker:'<path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5"/>',reload:'<path d="M13 8a5 5 0 1 1-1.5-3.5"/><path d="M13 2.5v3h-3"/>',drag:'<path d="M5 3v10M8 3v10M11 3v10"/>',
  grain:'<circle cx="4" cy="5" r=".9"/><circle cx="9" cy="3.5" r=".9"/><circle cx="12.5" cy="8" r=".9"/><circle cx="6" cy="10" r=".9"/><circle cx="10" cy="12.5" r=".9"/><circle cx="3" cy="13" r=".9"/>',
@@ -160,6 +175,7 @@ const P={
  pol:'<circle cx="8" cy="8" r="5"/><path d="M3 13 13 3"/>',rev:'<path d="M8 3 3 8l5 5M13 3 8 8l5 5"/>',save:'<path d="M2.5 2.5h9l2 2v9h-11z"/><path d="M5 2.5v4h6v-4M5 13.5v-4h6v4"/>',
  logo:'<rect x="1.5" y="1.5" width="13" height="13" fill="#2d3f8f" stroke="#7d8fd8"/><path d="M4 12 12 4" stroke="#fff"/>'
 };
+const STAR=f=>`<svg viewBox="0 0 16 16" width="13" height="13" fill="${f?'#f5c542':'none'}" stroke="${f?'#f5c542':'#9a9a9a'}" stroke-width="1.4" stroke-linejoin="round"><path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z"/></svg>`;
 const ic=(k,c='currentColor',s=14)=>`<svg viewBox="0 0 16 16" width="${s}" height="${s}" fill="none" stroke="${c}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${P[k]||''}</svg>`;
 const FICON={kick:'#ff5c5c',snare:'#ff5fa8',hat:'#f2c94c',clap:'#ff7ad9',perc:'#ff9b3d',bass:'#b583ff',vocal:'#4fd67e',fx:'#ff7ae6',keys:'#7d8cff',loop:'#2fd0bd',note:'#5aa0ff',guitar:'#ffae55',glitch:'#46a6ff',stack:'#2ec4c4',synth:'#9b8cff',diamond:'#a0a0a0',tape:'#d0d0d0',folder:'#c8c8c8'};
 const AUTO=[[/kick/,'kick'],[/snare|rim/,'snare'],[/hat|cymbal|ride|crash/,'hat'],[/clap|snap/,'clap'],[/perc|shaker|tom/,'perc'],[/drum|break|fill|beat/,'snare'],[/vocal|vox|voice|acapella|chant/,'vocal'],[/bass|808|sub|reese/,'bass'],[/synth|lead|pluck|pad|arp/,'synth'],[/\bkeys?\b|piano|chord|\borgans?\b|rhodes/,'keys'],[/guitar|string/,'guitar'],[/fx|sfx|riser|impact|laser|ambien|foley|texture/,'fx'],[/loop/,'loop'],[/music|melod|instrument|brass/,'note'],[/glitch|stutter/,'glitch'],[/pack|splice|kit|multikit/,'stack'],[/bounce|consolidat|record|edit/,'tape']];
@@ -168,7 +184,7 @@ const COLORS=['#d9434f','#e8892b','#e3c23d','#3fae5a','#2fb2c4','#3d7be0','#8a5a
 const CRATEC=['#8b2f36','#8a5a2c','#b5a273','#3d6b46','#2f5f7a','#5b4a8a'];
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const base=p=>p.slice(p.lastIndexOf('\\')+1),dirn=p=>p.slice(0,p.lastIndexOf('\\'));
-const ui=Object.assign({scale:1,bg:'',shade:.45,blur:0,rh:27,detH:230,autoIcons:true,top:true,tree:true,auto:true,rail:true},JSON.parse(localStorage.ui||'{}'));
+const ui=Object.assign({theme:'graphite',accent:'#4f8cff',sel:'#1f2fb8',wave:'timbre',hide:{},dock:true,daw:'live',org:false,scale:1,bg:'',shade:.45,blur:0,rh:27,detH:230,autoIcons:true,top:true,tree:true,auto:true,rail:true},JSON.parse(localStorage.ui||'{}'));
 let items=[],roots=[],db={},F=new Map(),mode=localStorage.mode||'all',q='',exp=new Set(JSON.parse(localStorage.exp||'[]')),rows=[],sel=-1,limit=200,showHidden=false,cur=null,dragItem=null,mt=null,hist=[mode],hi=0;
 ['logo','railb','back','fwd','spk'].forEach((k,n)=>$(k).innerHTML=ic(['logo','grid','back','fwd','speaker'][n],'#bdbdbd',k==='logo'?18:14));$('sic').innerHTML=ic('search','#888',12);$('logo').innerHTML='<svg viewBox="0 0 16 16" width="18" height="18" fill="#0a84ff">'+[[1,5.5,5],[3.5,3,10],[6,5,6],[8.5,1.5,13],[11,4,8],[13.5,6,4]].map(([x,y,h])=>`<rect x="${x}" y="${y}" width="1.6" height="${h}" rx=".8"/>`).join('')+'</svg>';$('logo').title='Rummage';
 
@@ -207,7 +223,11 @@ function cols(ab,W,a=0,b=1){const d=ab.getChannelData(0),s0=Math.floor(a*d.lengt
     const zw=Math.min(en-st,1500);for(let k=st+1;k<st+zw;k++)if((d[k]>=0)!==(d[k-1]>=0))z++;
     out.push([Math.min(1,m),zw>1?Math.min(1,Math.log(1+z/zw*400)/Math.log(121)):0])}
   return out}
-const hue=t=>`hsl(${14+t*205},85%,${52+t*6}%)`;
+const THEMES={graphite:['#1e1e1e','#2a2a2a','#323232','#3d3d3d','#161616','#3a3a3a'],midnight:['#11131a','#1a1d27','#222633','#2c3142','#0b0d12','#262b3a'],
+  warm:['#1f1b18','#2b2521','#352e29','#433a33','#171310','#3b332d'],oled:['#000000','#0c0c0c','#141414','#242424','#000000','#1c1c1c'],slate:['#1b2026','#252c34','#2e3640','#3a4450','#14181d','#333c47']};
+const ACCENTS=['#4f8cff','#0a84ff','#a855f7','#ec4899','#f0902c','#22c55e','#14b8a6','#ef4444','#eab308'],SELS=['#1f2fb8','#2b4bd6','#5b21b6','#9d174d','#9a4a0f','#166534','#0f766e','#991b1b','#3a3a3a'];
+const hexHsl=h=>{const n=parseInt(h.slice(1),16),r=(n>>16&255)/255,g=(n>>8&255)/255,b=(n&255)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let hh=0;if(d)hh=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;return Math.round(hh*60+360)%360};
+const hue=t=>ui.wave==='mono'?`hsl(0,0%,${62+t*20}%)`:ui.wave==='accent'?`hsl(${hexHsl(ui.accent)},80%,${42+t*26}%)`:`hsl(${14+t*205},85%,${52+t*6}%)`;
 function procBuf(){const b=A.ab;if(!b)return;const ch=b.numberOfChannels;let s0=0,s1=b.length;
   if(fx.trim){const th=.004,dd=[...Array(ch)].map((_,c)=>b.getChannelData(c)),hot=k=>dd.some(d=>Math.abs(d[k])>th);while(s0<s1-1&&!hot(s0))s0++;while(s1>s0+1&&!hot(s1-1))s1--}
   const out=AC.createBuffer(ch,s1-s0,b.sampleRate),sg=fx.pol?-1:1;
@@ -245,20 +265,32 @@ function thumbsFor(el){el.querySelectorAll('canvas.th').forEach(c=>{c.height=c.c
 
 /* ---------- library tree ---------- */
 const rootName=r=>/\\Splice\\Samples$/i.test(r)?'Splice':/\\Ableton\\User Library$/i.test(r)?'User Library':/\\Rummage\\Library$/i.test(r)?'My Library':/\\Rummage\\Edits$/i.test(r)?'Edits':base(r);
-const fname=d=>d==='@plugins'?'Plugins':d.startsWith('@plugins/')?CATS[d.slice(9)]:roots.includes(d)?rootName(d):base(d);
+const fname=d=>d==='@org'?'Samples · by type':d.startsWith('@org/')?orgOf(d).pop():d==='@plugins'?'Plugins':d.startsWith('@plugins/')?CATS[d.slice(9)]:roots.includes(d)?rootName(d):base(d);
 function plain(d){const pl=db.plain||{};for(let x=d;x&&x.includes('\\');x=dirn(x))if(pl[x])return true;return false}
-function icon(d){if(d==='@plugins')return'<svg width="14" height="14" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" fill="#1e8f86"/><path d="M4 6h8M4 9h5" stroke="#9ff0e8" stroke-width="1.3"/></svg>';
+function icon(d){if(d==='@org')return ic('stack',FICON.stack);if(d.startsWith('@org/')){const k=SCATIC[orgOf(d).pop()]||'folder';return ic(k,FICON[k]||'#c8c8c8')}if(d==='@plugins')return'<svg width="14" height="14" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" fill="#1e8f86"/><path d="M4 6h8M4 9h5" stroke="#9ff0e8" stroke-width="1.3"/></svg>';
   if(d.startsWith('@plugins/'))return ic(d.slice(9),'#e8892b');const fi=(db.ficon||{})[d];if(fi)return ic(fi,FICON[fi]);
   if(fi===''||!ui.autoIcons||plain(d))return ic('folder','#c8c8c8');const n=fname(d).toLowerCase();for(const[r,k]of AUTO)if(r.test(n))return ic(k,FICON[k]);return ic('folder','#c8c8c8')}
 function index(){F=new Map();const get=d=>{let f=F.get(d);if(!f)F.set(d,f={dirs:new Set(),files:[],n:0});return f};roots.forEach(get);
   const lr=roots.map(r=>r.toLowerCase()+'\\');
   for(const i of items){if(!i.path||i.kind==='plugin')continue;const lp=i.path.toLowerCase(),k=lr.findIndex(r=>lp.startsWith(r));if(k<0)continue;const r=roots[k];
     let d=dirn(i.path);get(d).files.push(i);for(;;){get(d).n++;if(d.length<=r.length)break;const p=dirn(d);get(p).dirs.add(d);d=p}}
-  const cmp=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'});for(const f of F.values())f.files.sort((a,b)=>cmp(a.name,b.name))}
-const plugs=c=>items.filter(i=>i.kind==='plugin'&&(!c||i.cat===c));
-function cnt(d){if(d==='@plugins')return plugs().length;if(d.startsWith('@plugins/'))return plugs(d.slice(9)).length;return(F.get(d)||{n:0}).n}
+  const cmp=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'});for(const f of F.values())f.files.sort((a,b)=>cmp(a.name,b.name));
+  ORG={};for(const i of items)if(i.kind==='sample'){i.scat=sampleCat(i);const c=ORG[i.scat]||(ORG[i.scat]={Loops:[],'One-shots':[]});c[i.loop?'Loops':'One-shots'].push(i)}for(const c of Object.values(ORG))for(const k in c)c[k].sort((a,b)=>cmp(a.name,b.name))}
+const hostOk=i=>!i.daw||i.daw===ui.daw,HOST=()=>ui.daw==='fl'?'FL Studio':'Ableton';
+const plugs=c=>items.filter(i=>i.kind==='plugin'&&hostOk(i)&&(!c||i.cat===c));
+// automatic sample sorting by type (file name first, then folder names)
+const SCATS=[['808s & Bass',/808|\bbass|\bsub\b|reese/],['Kicks',/kick|\bkck|\bbd\b/],['Snares',/snare|\bsnr\b|\brim\b/],['Claps',/clap|\bsnap/],['Hi-hats',/hat|\bhh\b|hihat/],['Cymbals',/cymbal|crash|\bride\b/],
+  ['Percussion',/perc|shaker|\btoms?\b|conga|bongo|tamb|clave|cowbell/],['Drums',/drum|break|\bbeat|groove|\btop\b|\bfill/],['Vocals',/vocal|\bvox|voice|chant|acapella|adlib|phrase/],
+  ['FX',/\bfx|sfx|riser|impact|sweep|whoosh|lifter|noise|foley|texture|ambien|laser/],['Keys & Piano',/piano|\bkeys?\b|rhodes|organ|chord|epiano/],['Pads',/\bpad|atmos|drone/],
+  ['Synths & Leads',/synth|\blead|pluck|\barp|\bsaw/],['Guitars',/guitar|\bgtr|requinto|ukulele|banjo/],['Strings & Brass',/string|violin|cello|orch|brass|horn|trumpet|\bsax|flute/]];
+const SCATIC={'808s & Bass':'bass',Kicks:'kick',Snares:'snare',Claps:'clap','Hi-hats':'hat',Cymbals:'hat',Percussion:'perc',Drums:'snare',Vocals:'vocal',FX:'fx','Keys & Piano':'keys',Pads:'synth','Synths & Leads':'synth',Guitars:'guitar','Strings & Brass':'note',Other:'diamond',Loops:'loop','One-shots':'diamond'};
+function sampleCat(i){const t=x=>x.toLowerCase().replace(/[_\-.]+/g,' ');const n=t(i.name);for(const[c,r]of SCATS)if(r.test(n))return c;const p=t(dirn(i.path));for(const[c,r]of SCATS)if(r.test(p))return c;return'Other'}
+let ORG={};
+const orgOf=d=>d.split('/').slice(1);
+function cnt(d){if(d==='@org')return Object.values(ORG).reduce((a,c)=>a+c.Loops.length+c['One-shots'].length,0);if(d.startsWith('@org/')){const[c,k]=orgOf(d),o=ORG[c]||{};return k?(o[k]||[]).length:(o.Loops||[]).length+(o['One-shots']||[]).length}if(d==='@plugins')return plugs().length;if(d.startsWith('@plugins/'))return plugs(d.slice(9)).length;return(F.get(d)||{n:0}).n}
 const ffav=d=>(db.ffav||{})[d]?1:0;
-function kids(d){if(d==='@plugins')return{dirs:Object.keys(CATS).map(c=>'@plugins/'+c).filter(cnt),files:[]};if(d.startsWith('@plugins/'))return{dirs:[],files:plugs(d.slice(9)).sort((a,b)=>b.fav-a.fav||a.name.localeCompare(b.name))};
+function kids(d){if(d==='@org')return{dirs:[...SCATS.map(c=>c[0]),'Other'].map(c=>'@org/'+c).filter(cnt),files:[]};if(d.startsWith('@org/')){const[c,k]=orgOf(d);return k?{dirs:[],files:srt((ORG[c]||{})[k]||[])}:{dirs:['Loops','One-shots'].map(x=>d+'/'+x).filter(cnt),files:[]}}
+  if(d==='@plugins')return{dirs:Object.keys(CATS).map(c=>'@plugins/'+c).filter(cnt),files:[]};if(d.startsWith('@plugins/'))return{dirs:[],files:plugs(d.slice(9)).sort((a,b)=>b.fav-a.fav||a.name.localeCompare(b.name))};
   const f=F.get(d);return f?{dirs:[...f.dirs].sort((a,b)=>ffav(b)-ffav(a)||base(a).localeCompare(base(b),undefined,{numeric:true})),files:srt(f.files)}:{dirs:[],files:[]}}
 const visD=d=>showHidden||!(db.hideF||{})[d];
 function walk(d,depth){if(!visD(d))return;rows.push({t:'d',d,depth});if(exp.has(d)){const k=kids(d);k.dirs.forEach(x=>walk(x,depth+1));k.files.forEach(i=>rows.push({t:'f',i,depth:depth+1}))}}
@@ -271,11 +303,13 @@ function build(){build0();if(rows.every(r=>r.depth===0))rows=[...rows.filter(r=>
 const srt=a=>ui.sort==="new"?a.slice().sort((x,y)=>(y.added||0)-(x.added||0)):a;
 function build0(){rows=[];const tok=q.toLowerCase().split(/\s+/).filter(Boolean);
   if(tok.length){let n=0;for(const d of F.keys())if(n<30&&visD(d)&&tok.every(t=>(fname(d)+' '+tagsOf(d).join(' ')).toLowerCase().includes(t))){rows.push({t:'d',d,depth:0});n++}
-    items.filter(i=>matchQ(i,tok)).slice(0,5000).forEach(i=>rows.push({t:'f',i,depth:0}));return}
-  if(mode==='all'){const rs=roots.filter(r=>cnt(r)||/\\Rummage\\Library$/i.test(r));if(ui.tree){rs.forEach(r=>walk(r,0));walk('@plugins',0)}else rs.forEach(r=>under(r).forEach(i=>rows.push({t:'f',i,depth:0})))}
+    items.filter(i=>(i.kind!=='plugin'||hostOk(i))&&matchQ(i,tok)).slice(0,5000).forEach(i=>rows.push({t:'f',i,depth:0}));return}
+  if(mode==='all'&&ui.org&&ui.tree){walk('@org',0);walk('@plugins',0)}
+  else if(mode==='all'&&ui.org){(ORG?Object.values(ORG):[]).forEach(c=>[...c.Loops,...c['One-shots']].forEach(i=>rows.push({t:'f',i,depth:0})))}
+  else if(mode==='all'){const rs=roots.filter(r=>cnt(r)||/\\Rummage\\Library$/i.test(r));if(ui.tree){rs.forEach(r=>walk(r,0));walk('@plugins',0)}else rs.forEach(r=>under(r).forEach(i=>rows.push({t:'f',i,depth:0})))}
   else if(mode==='plugins')children('@plugins');
   else if(mode==='presets')items.filter(i=>i.kind==='chain'||i.kind==='preset').forEach(i=>rows.push({t:'f',i,depth:0}));
-  else if(mode==='projects')items.filter(i=>i.kind==='track').forEach(i=>rows.push({t:'f',i,depth:0}));
+  else if(mode==='projects')items.filter(i=>i.kind==='track'||i.kind==='project').forEach(i=>rows.push({t:'f',i,depth:0}));
   else if(mode==='splice'){const r=roots.find(r=>/\\Splice\\Samples$/i.test(r));if(r)children(r)}
   else if(mode==='fav')items.filter(i=>i.fav).forEach(i=>rows.push({t:'f',i,depth:0}));
   else if(mode==='new')items.filter(i=>i.isNew).forEach(i=>rows.push({t:'f',i,depth:0}));
@@ -286,12 +320,12 @@ function rowHtml(r,n){
   if(r.t==='d'){const d=r.d,col=(db.fcolor||{})[d];return`<div class="r fd${n===sel?' sel':''}${(db.hideF||{})[d]?' hid':''}${(db.divs||{})[d]?' dv':''}" data-n="${n}" draggable="true" style="--ind:${r.depth};${col?'--fc:'+col:''}"><span class="chev${exp.has(d)?' o':''}">›</span>${icon(d)}<span class="n">${ffav(d)?'★ ':''}${esc(fname(d))}</span><span class="tg">${esc(tagsOf(d).join(' · '))}</span><span class="c">${fmtN(cnt(d))}</span></div>`}
   const i=r.i,isS=i.kind==='sample',ext=isS&&i.path?i.path.split('.').pop().toLowerCase():'',lab=i.kind==='plugin'?i.fmt:{chain:'RACK',preset:'PRESET',track:'TRACK'}[i.kind];
   const s=(cur&&cur.id===i.id)||n===sel?' sel':'';
-  return`<div class="r fl${s}" data-n="${n}" draggable="true" style="--ind:${r.depth}"><span class="dash" data-fav="1">${i.fav?'<b>★</b>':'<i></i>'}</span>${isS?`<canvas class="th" width="62" data-p="${esc(i.path)}"></canvas>`:`<span class="bd ${i.kind==='plugin'?i.fmt:i.kind}">${lab}</span>`}<span class="n">${esc(i.name)}${ext?`<small>.${ext}</small>`:''}</span><span class="tg">${esc(tagsOf(i.id).join(' · ')||(i.kind==='plugin'?i.vendor:''))}</span><span class="c"></span></div>`}
+  return`<div class="r fl${s}" data-n="${n}" draggable="true" style="--ind:${r.depth}"><span class="dash${i.fav?' on':''}" data-fav="1" title="${i.fav?'remove from favourites':'add to favourites'}">${STAR(i.fav)}</span>${isS?`<canvas class="th" width="62" data-p="${esc(i.path)}"></canvas>`:`<span class="bd ${i.kind==='plugin'?i.fmt:i.kind}">${lab}</span>`}<span class="n">${esc(i.name)}${ext?`<small>.${ext}</small>`:''}</span><span class="tg">${esc(tagsOf(i.id).join(' · ')||(i.kind==='plugin'?(vtag(i)||i.vendor):''))}</span><span class="c"></span></div>`}
 function render(keep){const L=$('list'),top=L.scrollTop;if(!keep)limit=200;build();
   const ci=cur?rows.findIndex(r=>r.t==='f'&&r.i.id===cur.id):-1;if(ci>=0){sel=ci;limit=Math.max(limit,ci+50)}else if(!keep)sel=-1;
   L.innerHTML=rows.length?rows.slice(0,limit).map(rowHtml).join(''):'<div class="empty">Nothing here. Try another search or add folders (⚙).</div>';
   L.scrollTop=keep?top:0;thumbsFor(L);
-  $('hidb').textContent=`hidden (${Object.keys(db.hideF||{}).length})`;$('hidb').classList.toggle('on',showHidden);$('foldb').classList.toggle('on',ui.tree);
+  $('hidb').textContent=`hidden (${Object.keys(db.hideF||{}).length})`;$('hidb').classList.toggle('on',showHidden);$('foldb').classList.toggle('on',ui.tree);$('orgb').classList.toggle('on',!!ui.org);
   $('qsv').style.display=q.trim()?'':'none';$('sortb').textContent=ui.sort==='new'?'newest first ▾':'name ▾';
   status(`${rows.length} shown · ${items.length} indexed`)}
 $('list').onscroll=e=>{const l=e.target;if(limit<rows.length&&l.scrollTop+l.clientHeight>l.scrollHeight-400){const a=limit;limit+=200;l.insertAdjacentHTML('beforeend',rows.slice(a,limit).map((r,k)=>rowHtml(r,a+k)).join(''));thumbsFor(l)}};
@@ -304,12 +338,12 @@ const crates=()=>{const c=db.crates||(db.crates={});let n=0;for(const k in c){if
 const save=k=>api.set(k,db[k]);
 function go(m){mode=m;localStorage.mode=m;q='';$('q').value='';hist=hist.slice(0,hi+1);if(hist[hi]!==m){hist.push(m);hi=hist.length-1}rail();render()}
 function rail(){const on=m=>mode===m?' on':'',rb=(m,k,l,ex='')=>`<div class="rb${on(m)}" data-m="${esc(m)}"${ex}><div class="tl">${typeof k==='string'&&P[k]?ic(k,'currentColor',15):k}</div><span>${esc(l)}</span></div>`;
-  let h=rb('all','all','all')+rb('plugins','plugins','plugins')+rb('presets','presets','presets')+rb('projects','projects','projects')+rb('splice','splice','splice')+rb('fav','star','favs')+(items.some(i=>i.isNew)?rb('new','recent','recent'):'');
-  h+='<h6>FOLDERS</h6><div class="pinzone" id="pz">'+(db.pins||[]).map(p=>rb('pin:'+p,icon(p),fname(p),` data-pin="${esc(p)}"`)).join('')+'</div>';
-  const ss=db.searches||[];if(ss.length)h+='<h6>SEARCHES</h6>'+ss.map((s,x)=>`<div class="rb${q===s.q?' on':''}" data-sq="${x}" title="${esc(s.q)}"><div class="tl">${ic('search','currentColor',13)}</div><span>${esc(s.name)}</span></div>`).join('');
-  h+='<h6>CRATES</h6>'+Object.entries(crates()).map(([k,c])=>`<div class="rb${on('crate:'+k)}" data-m="crate:${esc(k)}" data-crate="${esc(k)}"><div class="tl" style="background:${c.color};border-color:${c.color}">${ic('crate','rgba(255,255,255,.6)',15)}<em>${c.ids.length}</em></div><span>${esc(k)}</span></div>`).join('')+`<div class="rb" id="newc"><div class="tl">${ic('plus','currentColor',13)}</div><span>new</span></div>`;
+  const H=k=>!ui.hide['r-'+k];let h=rb('all','all','all')+(H('plugins')?rb('plugins','plugins','plugins'):'')+(H('presets')?rb('presets','presets','presets'):'')+(H('projects')?rb('projects','projects','projects'):'')+(H('splice')?rb('splice','splice','splice'):'')+(H('fav')?rb('fav','star','favs'):'')+(H('new')&&items.some(i=>i.isNew)?rb('new','recent','recent'):'');
+  if(H('folders'))h+='<h6>FOLDERS</h6><div class="pinzone" id="pz">'+(db.pins||[]).map(p=>rb('pin:'+p,icon(p),fname(p),` data-pin="${esc(p)}"`)).join('')+'</div>';
+  const ss=db.searches||[];if(ss.length&&H('searches'))h+='<h6>SEARCHES</h6>'+ss.map((s,x)=>`<div class="rb${q===s.q?' on':''}" data-sq="${x}" title="${esc(s.q)}"><div class="tl">${ic('search','currentColor',13)}</div><span>${esc(s.name)}</span></div>`).join('');
+  if(H('crates'))h+='<h6>CRATES</h6>'+Object.entries(crates()).map(([k,c])=>`<div class="rb${on('crate:'+k)}" data-m="crate:${esc(k)}" data-crate="${esc(k)}"><div class="tl" style="background:${c.color};border-color:${c.color}">${ic('crate','rgba(255,255,255,.6)',15)}<em>${c.ids.length}</em></div><span>${esc(k)}</span></div>`).join('')+`<div class="rb" id="newc"><div class="tl">${ic('plus','currentColor',13)}</div><span>new</span></div>`;
   $('rmid').innerHTML=h;
-  $('rbot').innerHTML=`<span class="ib" id="addfb" title="Add folder">${ic('addf')}</span><span class="ib" id="bgb" title="Background image">${ic('img')}</span><span class="sw2${ui.auto?' on':''}" id="autob" title="Auto-play"><i></i></span><span class="ib${ui.detH>0?'':' dim'}" id="panb" title="Preview panel">${ic('panel')}</span><span class="ib${ui.top?'':' dim'}" id="topb" title="Always on top">${ic('pin','#7aa2ff')}</span><span class="ib" id="gear" title="Settings">${ic('gear')}</span>`;
+  $('rbot').innerHTML=`<span class="ib" id="addfb" title="Add folder">${ic('addf')}</span><span class="ib" id="dockb" title="Dock: Rummage left, ${HOST()} right">${ic('dock')}</span><span class="ib" id="bgb" title="Background image">${ic('img')}</span><span class="sw2${ui.auto?' on':''}" id="autob" title="Auto-play"><i></i></span><span class="ib${ui.detH>0?'':' dim'}" id="panb" title="Preview panel">${ic('panel')}</span><span class="ib${ui.top?'':' dim'}" id="topb" title="Always on top" style="color:var(--blue)">${ic('pin')}</span><span class="ib" id="gear" title="Settings">${ic('gear')}</span>`;
   $('rail').classList.toggle('col',!ui.rail)}
 $('rail').onclick=async e=>{const t=e.target.closest('.rb,.ib,.sw2,.collapse');if(!t)return;
   if(t.dataset.m)go(t.dataset.m);
@@ -320,6 +354,7 @@ $('rail').onclick=async e=>{const t=e.target.closest('.rb,.ib,.sw2,.collapse');i
     menu({clientX:r.right+4,clientY:r.top},`<div class="mt">name your crate</div><input data-act="rename" value="${esc(k)}"><div class="sw">${CRATEC.concat(COLORS).map(c=>`<i data-ccol="${c}" style="background:${c}"></i>`).join('')}</div>`);
     const inp=$('menu').querySelector('input');inp.focus();inp.select()}
   else if(t.id==='addfb'){const f=await api.addFolder();if(f){api.rewatch();scan()}}
+  else if(t.id==='dockb'){api.dock(ui.daw);status('docking '+HOST()+'...')}
   else if(t.id==='bgb')pickBg();
   else if(t.id==='autob'){ui.auto=!ui.auto;applyUI();rail()}
   else if(t.id==='panb'){ui.detH=ui.detH>0?0:230;applyUI();rail();detail()}
@@ -363,13 +398,14 @@ function detail(){const D=$('det'),i=cur;D.style.display=ui.detH>0?'':'none';$('
     ${tagRow(i)}
     <div class="tools"><button class="tb wide${grain?' on':''}" id="grainb">${ic('grain','currentColor',13)}<span>grain</span></button>${tb('data-fx="trim"','trim','trim',fx.trim)}${tb('data-fx="norm"','norm','normalize',fx.norm)}${tb('data-fx="swap"','swap','swap L/R',fx.swap)}${tb('data-fx="pol"','pol','polarity',fx.pol)}${tb('data-fx="rev"','rev','reverse',fx.rev)}<span class="sp"></span><div class="tempo" title="Tempo: changes the speed, not the key · double-click = original"><div class="knob sm" data-k="tempo"><i></i></div><span><b id="kv-tempo"></b><br>${i.bpm?'orig '+i.bpm:'tempo'}</span></div>${tb('id="save"','save','save')}</div>`;
     paintK();requestAnimationFrame(waveCache)}
-  else{const isP=i.kind==='plugin',lab=isP?i.fmt:{chain:'RACK',preset:'PRESET',track:'TRACK'}[i.kind];
-    D.innerHTML=`<div class="dh"><b>${esc(i.name)}</b><span class="ext">${lab}</span><span class="sp"></span>${crs}${fav}${isP?'':`<button class="ob" id="drag" draggable="true" title="drag into Ableton">${ic('drag','currentColor',12)}</button>`}</div>
-    <div class="pinfo"><div class="big">${isP?ic(i.cat,'#e8892b',22):ic(i.kind==='track'?'projects':'presets','#e8892b',22)}</div><div><div style="font-weight:700">${esc(i.vendor||'')}</div><div class="meta">${esc(i.path||'Ableton Live device')}</div></div></div>
-    ${tagRow(i)}
-    <div class="tools">${isP?`<button class="tb" id="ld" style="width:auto;padding:0 10px;flex-direction:row;gap:6px;border-color:#3e63c9;color:#9fbaff;background:#25293a">${ic('fwd','currentColor',12)}<span style="font-size:10px">load into Ableton</span></button><select id="cat">${Object.entries(CATS).map(([k,l])=>`<option value="${k}"${k===i.cat?' selected':''}>${l}</option>`).join('')}</select>`:`${tb('id="rev"','folder','show')}`}</div>`}}
+  else{const isP=i.kind==='plugin',lab=isP?i.fmt:{chain:'RACK',preset:'PRESET',track:'TRACK',project:'FLP'}[i.kind],dragP=isP?(ui.daw==='fl'&&plugFst(i)):i.path;
+    D.innerHTML=`<div class="dh"><b>${esc(i.name)}</b><span class="ext">${lab}</span><span class="sp"></span>${crs}${fav}${!dragP?'':`<button class="ob" id="drag" draggable="true" title="drag into ${HOST()}">${ic('drag','currentColor',12)}</button>`}</div>
+    <div class="pinfo"><div class="big">${isP?ic(i.cat,'#e8892b',22):ic(i.kind==='track'?'projects':'presets','#e8892b',22)}</div><div><div style="font-weight:700">${esc(i.vendor||'')}</div><div class="meta">${esc(i.path||i.fst||(i.daw==='fl'?'FL Studio plugin':'Ableton Live device'))}</div></div></div>
+    ${isP&&VARS(i).length>1?`<div class="seg" style="margin:0">${VARS(i).map((v,k)=>`<button data-var="${k}" class="${k===vIdx(i)?'on':''}">${v.label}</button>`).join('')}</div>`:tagRow(i)}
+    <div class="tools">${isP?`<button class="tb" id="ld" style="width:auto;padding:0 10px;flex-direction:row;gap:6px;border-color:#3e63c9;color:#9fbaff;background:#25293a">${ic('fwd','currentColor',12)}<span style="font-size:10px">load into ${HOST()}</span></button><select id="cat">${Object.entries(CATS).map(([k,l])=>`<option value="${k}"${k===i.cat?' selected':''}>${l}</option>`).join('')}</select>`:`${tb('id="rev"','folder','show')}`}</div>`}}
 $('det').onclick=e=>{const i=cur,t=e.target.closest('button,.ut')||e.target;if(!i)return;AC.resume();
-  if(t.id==='fav')togFav(i);else if(t.id==='ld')api.live(i.name);else if(t.id==='rev')api.reveal(i.path);else if(t.id==='save')saveEdit();else if(t.id==='fit')loadSample(i);
+  if(t.dataset.var!==undefined){i.vsel=+t.dataset.var;detail();status(plugName(i));return}
+  if(t.id==='fav')togFav(i);else if(t.id==='ld')loadPlugin(i);else if(t.id==='rev')api.reveal(i.path);else if(t.id==='save')saveEdit();else if(t.id==='fit')loadSample(i);
   else if(t.id==='grainb'){grain=!grain;t.classList.toggle('on',grain);$('wave').draggable=!grain}
   else if(t.dataset.fx){fx[t.dataset.fx]^=1;t.classList.toggle('on',!!fx[t.dataset.fx]);procBuf()}
   else if(t.dataset.tg){db.tags[i.id]=tagsOf(i.id).filter(x=>x!==t.dataset.tg);save('tags');detail();render(true)}};
@@ -378,7 +414,7 @@ $('det').oninput=e=>{if(e.target.id==='gain'){gainDb=+e.target.value;gainN.gain.
 $('det').addEventListener('change',e=>{if(e.target.dataset.r)endDrag()});
 $('det').addEventListener('dblclick',e=>{const t=e.target;if(t.id==='gain'){t.value=gainDb=0;gainN.gain.value=1}else if(t.dataset.r){setK(t.dataset.r,0);t.value=0}});
 $('det').onkeydown=e=>{if(e.target.id==='tagin'&&e.key==='Enter'&&e.target.value.trim()){(db.tags||(db.tags={}))[cur.id]=[...new Set([...tagsOf(cur.id),e.target.value.trim()])];save('tags');detail();render(true);$('tagin').focus()}};
-$('det').ondragstart=e=>{if((e.target.id==='drag'||e.target.id==='wave')&&cur&&cur.path){e.preventDefault();dragItem=cur;api.drag(cur.path)}};
+$('det').ondragstart=e=>{const p=cur&&(cur.kind==='plugin'?(ui.daw==='fl'&&plugFst(cur)):cur.path);if((e.target.id==='drag'||e.target.id==='wave')&&p){e.preventDefault();dragItem=cur;api.drag(p)}};
 $('det').onwheel=e=>{if(e.target.id!=='wave'||!A.proc)return;e.preventDefault();const f=e.offsetX/e.target.clientWidth,c=A.v0+f*(A.v1-A.v0);let sp=(A.v1-A.v0)*(e.deltaY>0?1.25:.8);sp=Math.min(1,Math.max(.002,sp));A.v0=Math.max(0,Math.min(1-sp,c-f*sp));A.v1=A.v0+sp;waveCache()};
 $('det').ondblclick=e=>{if(e.target.id==='wave'){A.v0=0;A.v1=1;waveCache()}};
 $('det').oncontextmenu=e=>{if(e.target.id==='wave')e.preventDefault()};
@@ -387,14 +423,18 @@ $('det').onmousedown=e=>{const w=e.target.id==='wave'?e.target:null;if(!w||!A.pr
   if(e.button===0&&grain){grainAt(atX(e,w));const mv=ev=>{const r=w.getBoundingClientRect();grainAt((A.v0+Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width))*(A.v1-A.v0))*dur())},up=()=>{stop();removeEventListener('mousemove',mv);removeEventListener('mouseup',up)};addEventListener('mousemove',mv);addEventListener('mouseup',up)}
   else if(e.button===0)play(atX(e,w));
   else if(e.button===2){play(atX(e,w));const up=()=>{stop();AU.currentTime=0;frame();removeEventListener('mouseup',up)};addEventListener('mouseup',up)}};
+const VARS=i=>(i.variants||[]).filter(v=>v.label!=='default'),vIdx=i=>{const v=VARS(i);return i.vsel??Math.max(0,v.findIndex(x=>/^stereo$/i.test(x.label)))};
+const plugFst=i=>{const v=VARS(i);return v.length?v[vIdx(i)].fst:i.fst},plugName=i=>{const v=VARS(i);return v.length?i.name+' '+v[vIdx(i)].label:i.name};
+const vtag=i=>{const v=VARS(i).map(x=>x.label.toLowerCase());return v.length>1?v.join(' · '):''};
+const loadPlugin=i=>{if(ui.daw==='fl'){const f=plugFst(i);if(f){api.openFst(f);status('opening '+i.name+' in FL Studio')}else status('FL has no preset for this plugin: scan it once in FL')}else api.live(plugName(i))};
 function togFav(i){i.fav=!i.fav;api.patch('fav',i.id,i.fav);detail();render(true)}
 
 /* ---------- list events ---------- */
 $('list').onclick=e=>{AC.resume();const r=e.target.closest('.r');if(!r)return;const n=+r.dataset.n,x=rows[n];if(x.t==='d'){markSel(n);toggle(x.d)}else if(e.target.closest('[data-fav]'))togFav(x.i);else pick(n)};
-$('list').ondblclick=e=>{const r=e.target.closest('.r');if(!r)return;const x=rows[+r.dataset.n];if(x.t==='f'&&x.i.kind==='plugin')api.live(x.i.name)};
+$('list').ondblclick=e=>{const r=e.target.closest('.r');if(!r)return;const x=rows[+r.dataset.n];if(x.t==='f'&&x.i.kind==='plugin')loadPlugin(x.i)};
 $('list').ondragstart=e=>{const r=e.target.closest('.r');if(!r)return;const x=rows[+r.dataset.n];
   if(x.t==='d'){e.dataTransfer.setData('text/sd-folder',x.d);e.dataTransfer.effectAllowed='copy';return}
-  dragItem=x.i;if(x.i.path&&x.i.kind!=='plugin'){e.preventDefault();api.drag(x.i.path)}else e.dataTransfer.setData('text/plain',x.i.name)};
+  dragItem=x.i;const p=x.i.kind==='plugin'?(ui.daw==='fl'&&plugFst(x.i)):x.i.path;if(p){e.preventDefault();api.drag(p)}else e.dataTransfer.setData('text/plain',x.i.name)};
 $('list').oncontextmenu=e=>{const r=e.target.closest('.r');if(!r)return;e.preventDefault();const x=rows[+r.dataset.n];markSel(+r.dataset.n);
   const cl=Object.keys(crates()).map(k=>`<a data-crate="${esc(k)}">${esc(k)}</a>`).join('')||'<div class="mt" style="color:#888">no crates yet</div>',sub=`<a class="sub">▤ add to crate... <span>▸</span><div class="subm">${cl}</div></a>`;
   if(x.t==='d'){mt=x;const d=x.d,real=!d.startsWith('@'),isX=(db.folders||[]).includes(d),nm=esc(fname(d));
@@ -432,7 +472,7 @@ $('menu').onclick=e=>{const t=e.target.closest('a,i')||e.target,a=t.dataset.act,
   else if(a==='rmroot'){api.rmFolder(x.d).then(()=>{api.rewatch();scan()})}
   else if(a==='autoicons'){ui.autoIcons=!ui.autoIcons;applyUI()}
   else if(a==='autoic'){setF('ficon',x.d,undefined);setF('plain',x.d,undefined)}else if(a==='noic')setF('ficon',x.d,'');else if(a==='plain')setF('plain',x.d,1);
-  else if(a==='play')pick(rows.indexOf(x));else if(a==='load')api.live(x.i.name);else if(a==='fav')togFav(x.i);
+  else if(a==='play')pick(rows.indexOf(x));else if(a==='load')loadPlugin(x.i);else if(a==='fav')togFav(x.i);
   else if(a==='hidef'){api.patch('hide',x.i.id);items=items.filter(i=>i!==x.i);index()}
   else return;
   hideMenu();rail();render(true)};
@@ -449,31 +489,54 @@ let lastScale=0;
 const fitHeader=()=>{const wco=navigator.windowControlsOverlay,rc=wco&&wco.visible?wco.getTitlebarAreaRect():null;
   $('header').style.paddingRight=(rc&&rc.width?Math.ceil(innerWidth-rc.right):Math.ceil(140/ui.scale))+8+'px'};
 if(navigator.windowControlsOverlay)navigator.windowControlsOverlay.addEventListener('geometrychange',fitHeader);
-function applyUI(){const r=document.documentElement.style;setTimeout(fitHeader,80);if(ui.scale!==lastScale){lastScale=ui.scale;api.zoom(ui.scale);setTimeout(()=>{waveCache();layoutBg()},60)}r.setProperty('--rh',ui.rh+'px');
+const HIDE=[['chips','filter bar'],['hd','column titles'],['tags','tags column'],['count','files column'],['thumbs','waveform thumbnails'],['tools','edit buttons'],['autotags','auto tags'],['status','status bar'],
+  ['r-plugins','sidebar: plugins'],['r-presets','sidebar: presets'],['r-projects','sidebar: projects'],['r-splice','sidebar: splice'],['r-fav','sidebar: favs'],['r-new','sidebar: recent'],['r-folders','sidebar: folders'],['r-crates','sidebar: crates'],['r-searches','sidebar: searches']];
+function applyUI(){const r=document.documentElement.style;const th=THEMES[ui.theme]||THEMES.graphite;['--bg','--pn','--pn2','--ln','--ln2','--tile'].forEach((v,i)=>r.setProperty(v,th[i]));r.setProperty('--blue',ui.accent);r.setProperty('--sel',`color-mix(in srgb,${ui.accent} 55%,#0b0b0b)`);
+  document.body.style.background=th[0];api.titlebar(th[1]);HIDE.forEach(([k])=>document.body.classList.toggle('h-'+k,!!ui.hide[k]));setTimeout(fitHeader,80);if(ui.scale!==lastScale){lastScale=ui.scale;api.zoom(ui.scale);setTimeout(()=>{waveCache();layoutBg()},60)}r.setProperty('--rh',ui.rh+'px');
   $('bg').style.backgroundImage=ui.bg?`url("${ui.bg}")`:'';$('bg').style.filter=ui.blur?`blur(${ui.blur}px)`:'';$('shade').style.opacity=ui.bg?ui.shade:0;
   $('det').style.height=ui.detH+'px';$('zoom').value=ui.rh;$('rail').classList.toggle('col',!ui.rail);localStorage.ui=JSON.stringify(ui);requestAnimationFrame(layoutBg)}
 async function pickBg(){const u=await api.pickBg();if(u){ui.bg=u;applyUI();cfg()}}
-function cfg(){$('cfg').innerHTML=`<b>Background</b><div style="display:flex;gap:4px;margin:5px 0"><button id="cbg">choose image...</button>${ui.bg?'<button id="cbgx">remove</button>':''}</div>
-  <label>darken<input type="range" id="cshade" min="0" max=".9" step=".05" value="${ui.shade}"></label><label>blur<input type="range" id="cblur" min="0" max="20" value="${ui.blur}"></label><hr>
-  <label>interface size <span id="cscv" style="color:#aaa">${Math.round(ui.scale*100)}%</span><input type="range" id="cscale" min=".8" max="1.6" step=".05" value="${ui.scale}"></label>
-  <label>row height<input type="range" id="crh" min="20" max="40" value="${ui.rh}"></label><hr>
-  <label>auto-play on select<input type="checkbox" id="cauto" ${ui.auto?'checked':''}></label><label>auto icons<input type="checkbox" id="cico" ${ui.autoIcons?'checked':''}></label><label>always on top<input type="checkbox" id="ctop" ${ui.top?'checked':''}></label><hr>
-  <b>Extra folders</b>${(db.folders||[]).map(x=>`<div class="f"><span>${esc(x)}</span><b data-rm="${esc(x)}">✕</b></div>`).join('')||'<div class="f">—</div>'}
-  <div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap"><button id="caddf">+ folder</button><button id="cseen">mark new as seen</button><button id="cscan">rescan</button></div>
-  <hr><div style="display:flex;justify-content:space-between;align-items:center"><span>Rummage v1.0.0 · MIT</span><button id="crepo" title="github.com/mitoisgrowing/rummage">GitHub ↗</button></div>`}
-$('cfg').onclick=async e=>{const t=e.target;
+const LOCS=[['samples','Samples'],['vst3','VST3 plugins'],['vst2','VST2 plugins'],['clap','CLAP plugins'],['waves','Waves'],['fl','FL Studio data (plugin database, projects)']];let PATHS={};
+let cfgTab='look';
+function cfg(){const tab=(k,l)=>`<button data-tab="${k}" class="${cfgTab===k?'on':''}">${l}</button>`,tog=(k,on,l)=>`<div class="crow"><span>${l}</span><i class="tg2${on?' on':''}" data-tog="${k}"></i></div>`,sec=l=>`<div class="sec">${l}</div>`;
+  let b='';
+  if(cfgTab==='look')b=sec('THEME')+`<div class="themes">${Object.entries(THEMES).map(([k,th])=>`<div><i data-theme="${k}" class="${ui.theme===k?'on':''}" style="background:linear-gradient(135deg,${th[2]} 50%,${th[0]} 50%)"></i><span>${k}</span></div>`).join('')}</div>`
+    +sec('ACCENT')+`<div class="dots">${ACCENTS.map(c=>`<i data-acc="${c}" class="${ui.accent===c?'on':''}" style="background:${c}"></i>`).join('')}</div>`
+    +sec('WAVEFORM COLOURS')+`<div class="seg">${[['timbre','by sound'],['accent','accent'],['mono','mono']].map(([k,l])=>`<button data-wave="${k}" class="${ui.wave===k?'on':''}">${l}</button>`).join('')}</div>`
+    +sec('SIZE')+`<div class="crow"><span>interface <b id="cscv" style="color:#aaa;font-weight:400">${Math.round(ui.scale*100)}%</b></span><input type="range" id="cscale" min=".8" max="1.6" step=".05" value="${ui.scale}"></div><div class="crow"><span>rows</span><input type="range" id="crh" min="20" max="40" value="${ui.rh}"></div>`
+    +sec('BACKGROUND IMAGE')+`<div class="crow"><span style="color:#999">${ui.bg?'custom image':'none'}</span><span><button id="cbg">choose…</button>${ui.bg?' <button id="cbgx">remove</button>':''}</span></div>`
+    +(ui.bg?`<div class="crow"><span>darken</span><input type="range" id="cshade" min="0" max=".9" step=".05" value="${ui.shade}"></div><div class="crow"><span>blur</span><input type="range" id="cblur" min="0" max="20" value="${ui.blur}"></div>`:'');
+  else if(cfgTab==='layout')b=sec('SIDEBAR')+HIDE.filter(([k])=>k.startsWith('r-')).map(([k,l])=>tog('show:'+k,!ui.hide[k],l.replace('sidebar: ',''))).join('')
+    +sec('BROWSER')+HIDE.filter(([k])=>!k.startsWith('r-')).map(([k,l])=>tog('show:'+k,!ui.hide[k],l)).join('')+tog('icons',ui.autoIcons,'folder icons from names');
+  else if(cfgTab==='library')b=sec('HOST')+`<div class="seg"><button data-daw="live" class="${ui.daw==='fl'?'':'on'}">Ableton Live</button><button data-daw="fl" class="${ui.daw==='fl'?'on':''}">FL Studio</button></div>`
+    +tog('dock',ui.dock,'dock next to the host automatically')+tog('auto',ui.auto,'play samples when selected')+tog('top',ui.top,'keep Rummage on top')
+    +sec('LOCATIONS')+`<div style="font-size:10px;color:#888;margin-top:-3px">click a path to change it</div>`
+    +LOCS.map(([k,l])=>`<div class="lh"><span>${l}</span><b data-preset="${k}" title="reset to default">↺</b></div>${(PATHS[k]||[]).map(p=>`<div class="f"><span data-pedit="${k}" data-p="${esc(p)}">${esc(p)}</span><b data-prm="${k}" data-p="${esc(p)}">✕</b></div>`).join('')||'<div class="f">—</div>'}<div class="f"><a data-padd="${k}">+ add folder</a></div>`).join('');
+  else b=sec('RUMMAGE')+`<div class="crow"><span>version 1.1.0 · MIT licence</span><button id="crepo">GitHub ↗</button></div>`
+    +sec('LIBRARY')+`<div class="crow"><span>${items.length} items indexed</span><button id="cscan">rescan</button></div><div class="crow"><span>${items.filter(i=>i.isNew).length} new items</span><button id="cseen">mark as seen</button></div>`;
+  $('cfg').innerHTML=`<div class="ctabs">${tab('look','Look')}${tab('layout','Layout')}${tab('library','Library')}${tab('about','About')}<button id="cclose" title="close">✕</button></div><div class="cbody">${b}</div>`}
+const repaint=()=>{render(true);waveCache()};
+$('cfg').onclick=async e=>{const t=e.target.closest('[data-tab],[data-tog],[data-theme],[data-acc],[data-wave],[data-daw],[data-padd],[data-pedit],[data-prm],[data-preset],button')||e.target,d=t.dataset;
+  if(t.id==='cclose'){$('cfg').style.display='none';return}
+  if(d.tab){cfgTab=d.tab;cfg();return}
+  if(d.tog){const k=d.tog;if(k.startsWith('show:')){const h=k.slice(5);ui.hide[h]=!ui.hide[h];rail();render(true)}else if(k==='icons'){ui.autoIcons=!ui.autoIcons;rail();render(true)}else if(k==='top'){ui.top=!ui.top;api.top(ui.top)}else ui[k]=!ui[k];applyUI();cfg();return}
+  if(d.theme){ui.theme=d.theme;applyUI();cfg();return}if(d.acc){ui.accent=d.acc;applyUI();cfg();repaint();return}if(d.wave){ui.wave=d.wave;applyUI();cfg();repaint();return}
   if(t.id==='cbg')pickBg();else if(t.id==='cbgx'){ui.bg='';applyUI();cfg()}
-  else if(t.id==='caddf'){const f=await api.addFolder();if(f){api.rewatch();scan()}}
-  else if(t.dataset.rm){await api.rmFolder(t.dataset.rm);api.rewatch();scan()}
-  else if(t.id==='cseen'){await api.patch('seen');items.forEach(i=>i.isNew=false);rail();render(true)}
+  else if(d.daw){ui.daw=d.daw;applyUI();cfg();rail();render();detail();showDaws()}
+  else if(d.padd||d.pedit||d.prm||d.preset){const k=d.padd||d.pedit||d.prm||d.preset;
+    const r=d.padd?await api.pathAdd(k):d.pedit?await api.pathAdd(k,d.p):d.prm?await api.pathRm(k,d.p):await api.pathReset(k);
+    if(r){PATHS=r;cfg();api.rewatch();scan(true)}}
+  else if(t.id==='cseen'){await api.patch('seen');items.forEach(i=>i.isNew=false);rail();render(true);cfg()}
   else if(t.id==='cscan')scan();
   else if(t.id==='crepo')api.openRepo()};
 $('cfg').onchange=e=>{if(e.target.id==='cscale'){ui.scale=+e.target.value;applyUI()}};
-$('cfg').oninput=e=>{const t=e.target;if(t.id==='cscale'){$('cscv').textContent=Math.round(+t.value*100)+'%';return}if(t.id==='crh'){ui.rh=+t.value;thumbsFor($('list'))}if(t.id==='cshade')ui.shade=+t.value;if(t.id==='cblur')ui.blur=+t.value;if(t.id==='cauto')ui.auto=t.checked;
-  if(t.id==='cico'){ui.autoIcons=t.checked;rail();render(true)}if(t.id==='ctop'){ui.top=t.checked;api.top(ui.top)}applyUI();rail()};
+$('cfg').oninput=e=>{const t=e.target;if(t.id==='cscale'){$('cscv').textContent=Math.round(+t.value*100)+'%';return}
+  if(t.id==='crh'){ui.rh=+t.value;thumbsFor($('list'))}if(t.id==='cshade')ui.shade=+t.value;if(t.id==='cblur')ui.blur=+t.value;applyUI()};
+
 $('zoom').oninput=e=>{ui.rh=+e.target.value;applyUI();thumbsFor($('list'))};
 $('split').onmousedown=e=>{const y0=e.clientY,h0=ui.detH,mv=ev=>{ui.detH=Math.max(170,Math.min(innerHeight*.7,h0+(y0-ev.clientY)));$('det').style.height=ui.detH+'px';waveCache();layoutBg()},up=()=>{applyUI();removeEventListener('mousemove',mv);removeEventListener('mouseup',up)};addEventListener('mousemove',mv);addEventListener('mouseup',up)};
 $('hidb').onclick=()=>{showHidden=!showHidden;render(true)};
+$('orgb').onclick=()=>{ui.org=!ui.org;applyUI();render()};
 $('foldb').onclick=()=>{ui.tree=!ui.tree;applyUI();render()};
 $('tagb').onclick=e=>{const all=[...new Set(Object.values(db.tags||{}).flat())].sort();mt=null;menu(e,'<div class="mt">filter by tag</div><hr>'+(all.map(t=>`<a data-qt="${esc(t)}">${esc(t)}</a>`).join('')||'<div class="mt" style="color:#888">no tags yet</div>'))};
 $('railb').onclick=()=>{ui.rail=!ui.rail;applyUI();rail()};
@@ -484,7 +547,11 @@ $('qx').onclick=()=>{q='';$('q').value='';render()};
 $('qsv').onclick=()=>{if(!q.trim()||(db.searches||[]).some(s=>s.q===q))return;(db.searches||(db.searches=[])).push({name:q.trim().slice(0,24),q});save('searches');rail();status(`saved search "${q}"`)};
 $('sortb').onclick=()=>{ui.sort=ui.sort==='new'?'name':'new';applyUI();render(true)};
 const status=s=>$('st').textContent=s;
-api.onAbleton(v=>{const s=$('sync');s.classList.toggle('off',!v);s.textContent=v?'SYNC · Ableton running':'SYNC · waiting for Ableton'});
+let DAWS={};const showDaws=()=>{const on=ui.daw==='fl'?DAWS.fl:DAWS.live,s=$('sync');s.classList.toggle('off',!on);s.textContent=on?`SYNC · ${HOST()} running`:`SYNC · waiting for ${HOST()}`};
+api.onDaws(v=>{const prev=DAWS;DAWS=v;
+  if(v.fl!==v.live){const only=v.fl?'fl':'live';if(only!==ui.daw&&(prev.fl!==v.fl||prev.live!==v.live)){ui.daw=only;applyUI();rail();render();detail();status('switched to '+HOST())}}
+  const on=ui.daw==='fl'?v.fl:v.live,was=ui.daw==='fl'?prev.fl:prev.live;if(ui.dock&&on&&!was)api.dock(ui.daw);showDaws()});
+api.onDocked(r=>status(r==='docked'?HOST()+' docked on the right':'open '+HOST()+' first'));
 addEventListener('resize',()=>{waveCache();layoutBg()});
 
 /* drop files from Explorer / Live into the library */
@@ -503,12 +570,12 @@ addEventListener('keydown',e=>{const T=e.target.tagName;
   if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(!rows.length)return;const n=Math.max(0,Math.min(rows.length-1,sel+(e.key==='ArrowDown'?1:-1)));if(n>=limit){limit+=200;render(true)}rows[n].t==='f'?pick(n):markSel(n)}
   else if(e.key==='ArrowRight'&&r&&r.t==='d'&&!exp.has(r.d))toggle(r.d);
   else if(e.key==='ArrowLeft'&&r&&r.t==='d'&&exp.has(r.d))toggle(r.d);
-  else if(e.key==='Enter'&&r){if(r.t==='d')toggle(r.d);else if(r.i.kind==='plugin')api.live(r.i.name)}
+  else if(e.key==='Enter'&&r){if(r.t==='d')toggle(r.d);else if(r.i.kind==='plugin')loadPlugin(r.i)}
   else if(e.key===' '){e.preventDefault();AC.resume();if(playing)stop();else if(AU.src){setRate();AU.play().catch(()=>{})}}
   else if(e.key.toLowerCase()==='f'&&cur)togFav(cur)});
 
 async function scan(quiet){if(!quiet)$('list').innerHTML='<div class="empty">Scanning plugins and samples...</div>';
-  db=await api.db();roots=await api.roots();items=await api.scan();index();
+  db=await api.db();roots=await api.roots();PATHS=(await api.paths()).paths;items=await api.scan();index();
   if(cur)cur=items.find(i=>i.id===cur.id)||cur;rail();render(quiet);if(!quiet)detail()}
 api.onChanged(()=>scan(true));
 rail();applyUI();paintK();api.top(ui.top);detail();scan();

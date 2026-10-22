@@ -1,8 +1,8 @@
 {
   "name": "rummage",
   "productName": "Rummage",
-  "version": "1.0.0",
-  "description": "A compact sample, plugin and preset browser that sits next to Ableton Live 12.",
+  "version": "1.1.0",
+  "description": "A compact sample, plugin and preset browser that docks next to Ableton Live and FL Studio.",
   "main": "main.js",
   "license": "MIT",
   "author": "mitoisgrowing",
@@ -13,7 +13,8 @@
     "splice",
     "vst",
     "music-production",
-    "electron"
+    "electron",
+    "fl-studio"
   ],
   "scripts": {
     "start": "electron .",

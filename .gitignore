@@ -2,3 +2,4 @@ node_modules/
 dist/
 *.log
 SoundDeck.bat
+promo-out/
