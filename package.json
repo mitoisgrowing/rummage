@@ -1,0 +1,60 @@
+{
+  "name": "rummage",
+  "productName": "Rummage",
+  "version": "1.0.0",
+  "description": "A compact sample, plugin and preset browser that sits next to Ableton Live 12.",
+  "main": "main.js",
+  "license": "MIT",
+  "author": "mitoisgrowing",
+  "keywords": [
+    "ableton",
+    "ableton-live",
+    "sample-browser",
+    "splice",
+    "vst",
+    "music-production",
+    "electron"
+  ],
+  "scripts": {
+    "start": "electron .",
+    "icons": "electron scripts/make-icons.js",
+    "dist": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "io.github.rummage.app",
+    "productName": "Rummage",
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "assets/**"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Rummage"
+    }
+  },
+  "homepage": "https://github.com/mitoisgrowing/rummage",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mitoisgrowing/rummage.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mitoisgrowing/rummage/issues"
+  }
+}

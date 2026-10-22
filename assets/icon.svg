@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- tab / fold (the only darker part) -->
+  <path d="M14 46a20 20 0 0 1 20-20h58a16 16 0 0 1 12.4 5.9l9.2 11.2a8 8 0 0 0 6.2 2.9H222a20 20 0 0 1 20 20v30H14z" fill="#2b2d31"/>
+  <!-- folder body, one solid colour -->
+  <rect x="14" y="70" width="228" height="162" rx="20" fill="#3a3d42"/>
+  <!-- melody-like waveform printed on the front -->
+  <g fill="#0a84ff">
+    <rect x="40.0" y="137.0" width="8" height="30" rx="4"/>
+    <rect x="54.0" y="123.0" width="8" height="58" rx="4"/>
+    <rect x="68.0" y="131.0" width="8" height="42" rx="4"/>
+    <rect x="82.0" y="107.0" width="8" height="90" rx="4"/>
+    <rect x="96.0" y="119.0" width="8" height="66" rx="4"/>
+    <rect x="110.0" y="97.0" width="8" height="110" rx="4"/>
+    <rect x="124.0" y="127.0" width="8" height="50" rx="4"/>
+    <rect x="138.0" y="112.0" width="8" height="80" rx="4"/>
+    <rect x="152.0" y="100.0" width="8" height="104" rx="4"/>
+    <rect x="166.0" y="122.0" width="8" height="60" rx="4"/>
+    <rect x="180.0" y="109.0" width="8" height="86" rx="4"/>
+    <rect x="194.0" y="130.0" width="8" height="44" rx="4"/>
+    <rect x="208.0" y="139.0" width="8" height="26" rx="4"/>
+  </g>
+</svg>

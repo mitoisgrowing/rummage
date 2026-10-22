@@ -1,0 +1,23 @@
+const { contextBridge, ipcRenderer: r, webUtils } = require('electron');
+contextBridge.exposeInMainWorld('api', {
+  importFiles: files => r.invoke('import', [...files].map(f => webUtils.getPathForFile(f)).filter(Boolean)),
+  scan: () => r.invoke('scan'),
+  db: () => r.invoke('db'),
+  roots: () => r.invoke('roots'),
+  patch: (type, id, val) => r.invoke('patch', { type, id, val }),
+  set: (k, v) => r.invoke('set', k, v),
+  addFolder: () => r.invoke('addFolder'),
+  rmFolder: f => r.invoke('rmFolder', f),
+  pickBg: () => r.invoke('pickBg'),
+  saveWav: (name, data) => r.invoke('saveWav', name, data),
+  read: p => r.invoke('read', p),
+  drag: p => r.send('drag', p),
+  live: n => r.send('live', n),
+  reveal: p => r.send('reveal', p),
+  top: v => r.send('top', v),
+  zoom: s => r.send('zoom', s),
+  openRepo: () => r.send('openRepo'),
+  rewatch: () => r.send('rewatch'),
+  onChanged: cb => r.on('changed', cb),
+  onAbleton: cb => r.on('ableton', (_, v) => cb(v)),
+});
