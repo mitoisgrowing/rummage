@@ -1,8 +1,8 @@
 {
   "name": "rummage",
   "productName": "Rummage",
-  "version": "1.1.0",
-  "description": "A compact sample, plugin and preset browser that docks next to Ableton Live and FL Studio.",
+  "version": "1.2.0",
+  "description": "Samples, plugins and presets in one panel beside FL Studio or Ableton Live, with real plugin pictures.",
   "main": "main.js",
   "license": "MIT",
   "author": "mitoisgrowing",
@@ -32,7 +32,9 @@
       "main.js",
       "preload.js",
       "index.html",
-      "assets/**"
+      "assets/**",
+      "shots.js",
+      "i18n.js"
     ],
     "directories": {
       "output": "dist",
@@ -48,7 +50,17 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Rummage"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "native/vst3snap.exe",
+        "to": "vst3snap.exe"
+      },
+      {
+        "from": "daw",
+        "to": "daw"
+      }
+    ]
   },
   "homepage": "https://github.com/mitoisgrowing/rummage",
   "repository": {

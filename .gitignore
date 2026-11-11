@@ -3,3 +3,5 @@ dist/
 *.log
 SoundDeck.bat
 promo-out/
+native/*.exe
+native/*.obj

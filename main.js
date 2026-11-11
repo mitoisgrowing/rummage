@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog, nativeImage, clipboard, shell } = require('electron');
-const fs = require('fs'), path = require('path'), { exec } = require('child_process');
+const fs = require('fs'), path = require('path'), os = require('os'), crypto = require('crypto'), { exec, execFile } = require('child_process');
+const shots = require('./shots');
 
 app.setName('Rummage');
 // carry over data from the pre-rename "sounddeck" profile (db, ui settings, waveform cache)
@@ -19,7 +20,7 @@ let db = { favs: {}, cats: {}, hidden: {}, folders: [], v2: [] };
 try { db = { ...db, ...JSON.parse(fs.readFileSync(dbFile(), 'utf8')) }; } catch {}
 const saveDb = () => fs.writeFile(dbFile(), JSON.stringify(db), () => {});
 
-const AUDIO = /\.(wav|aif|aiff|flac|mp3|ogg|m4a)$/i, PRESET = /\.(adg|adv|als|flp)$/i;
+const AUDIO = /\.(wav|aif|aiff|flac|mp3|ogg|m4a)$/i, PRESET = /\.(adg|adv|als|flp|fst)$/i;
 
 const RULES = [
   ['tune', /tune|pitch|melodyne|antares|correct|harmoniz|whistl/],
@@ -71,7 +72,8 @@ if (!db.paths) { // first run after the update: fold the old "extra folders" lis
 }
 const paths = () => ({ ...DEFAULT_PATHS(), ...db.paths });
 const uniqPaths = a => [...new Map(a.map(p => [p.toLowerCase(), p])).values()];
-const roots = () => uniqPaths([...paths().samples, ...paths().fl.map(f => path.join(f, 'Projects')), LIB, EDITS]);
+// FL's own saved plugin presets live next to (not inside) its plugin database
+const roots = () => uniqPaths([...paths().samples, ...paths().fl.flatMap(f => [path.join(f, 'Projects'), path.join(f, 'Presets', 'Plugin presets')]), LIB, EDITS]);
 
 let watchers = [], timer;
 function watch(win) {
@@ -99,6 +101,9 @@ async function walk(dir, out, depth = 0) {
 // ---------- plugin detection ----------
 // one key per product, so "Pro-Q 4 (x64)", "Pro-Q 4 Stereo" and "pro-q 4" collapse together
 const pkey = n => n.toLowerCase().replace(/\.(vst3|dll|clap|bundle|fst)$/, '').replace(/\((x64|vst3?|clap|64.?bit)\)|[_ -]x64$|\s(mono|stereo|mono[-/]stereo|m\/s)$/g, '').replace(/[^a-z0-9]/g, '');
+// stable artwork key: derived from the product, not the install path, so a moved
+// plugin keeps its picture and two copies of the same product share one
+const shotKey = n => 'p' + crypto.createHash('sha1').update(pkey(n)).digest('hex').slice(0, 12);
 
 // VST3 bundles ship a moduleinfo.json with the plugin's official category and vendor
 function vst3Info(p) {
@@ -168,7 +173,7 @@ async function flDatabase() {
 
 async function scanPlugins() {
   const P = paths(), out = [], have = new Map();
-  const add = it => { const k = pkey(it.name); if (have.has(k)) return have.get(k); have.set(k, it); out.push(it); return it; };
+  const add = it => { const k = pkey(it.name); if (have.has(k)) return have.get(k); it.key = shotKey(it.name); have.set(k, it); out.push(it); return it; };
   async function w3(d, vendor, depth) {
     let es; try { es = await fs.promises.readdir(d, { withFileTypes: true }); } catch { return; }
     for (const e of es) {
@@ -219,7 +224,7 @@ async function scanPlugins() {
     const native = /^(fruity|new)$/i.test(e.fmt), base = vm ? e.name.slice(0, vm.index) : e.name;
     add({ id: 'fl:' + e.fst, kind: 'plugin', fmt: native ? 'FL' : e.fmt.toUpperCase().replace('VST', 'VST2').replace('VST23', 'VST3'), name: base, vendor: native ? 'Image-Line' : '', path: '', fst: e.fst, variants: [variant], flCat: e.flcat, gen: e.gen, daw: native ? 'fl' : '' });
   }
-  for (const [c, list] of Object.entries(STOCK)) for (const n of list) out.push({ id: 'stock:' + n, kind: 'plugin', fmt: 'Live', name: n, vendor: 'Ableton', path: '', stockCat: c, daw: 'live' });
+  for (const [c, list] of Object.entries(STOCK)) for (const n of list) out.push({ id: 'stock:' + n, key: shotKey(n), kind: 'plugin', fmt: 'Live', name: n, vendor: 'Ableton', path: '', stockCat: c, daw: 'live' });
   return out;
 }
 
@@ -260,12 +265,246 @@ async function scanAll() {
 
 const dragIcon = nativeImage.createFromBitmap(Buffer.alloc(32 * 32 * 4, 180), { width: 32, height: 32 });
 
-function sendToLive(name) {
+// ---------- plugin artwork (own capture engine) ----------
+const SHOTS = path.join(app.getPath('userData'), 'shots');
+try { fs.mkdirSync(SHOTS, { recursive: true }); } catch {}
+const shotSafe = k => /^p[0-9a-f]{12}$/i.test(String(k));
+const shotFile = k => path.join(SHOTS, String(k) + '.jpg');
+// key -> mtime, so the renderer can cache-bust an artwork that was replaced
+function shotIndex() {
+  const o = {};
+  try {
+    for (const f of fs.readdirSync(SHOTS)) {
+      const m = f.match(/^(p[0-9a-f]{12})\.jpg$/i);
+      if (!m) continue;
+      try { o[m[1]] = fs.statSync(path.join(SHOTS, f)).mtimeMs; } catch {}
+    }
+  } catch {}
+  return o;
+}
+const dimCache = new Map();
+function jpegSize(f) {
+  try {
+    const fd = fs.openSync(f, 'r'), b = Buffer.alloc(65536), n = fs.readSync(fd, b, 0, b.length, 0); fs.closeSync(fd);
+    for (let i = 2; i + 9 < n;) {
+      if (b[i] !== 0xFF) return null;
+      const mk = b[i + 1], len = b.readUInt16BE(i + 2);
+      if (mk >= 0xC0 && mk <= 0xC3) return [b.readUInt16BE(i + 7), b.readUInt16BE(i + 5)];
+      i += 2 + len;
+    }
+  } catch {}
+  return null;
+}
+// key -> [width, height], cached by file time so a replaced picture is measured again
+function shotDims(files) {
+  const o = {};
+  for (const [k, t] of Object.entries(files)) {
+    const c = dimCache.get(k);
+    if (c && c.t === t) { o[k] = c.d; continue; }
+    const d = jpegSize(shotFile(k)); if (d) { dimCache.set(k, { t, d }); o[k] = d; }
+  }
+  return o;
+}
+function writeShot(key, img) {
+  const { width, height } = img.getSize();
+  if (!width || !height) throw new Error('the image is empty');
+  const out = width > 900 ? img.resize({ width: 900, quality: 'best' }) : img;
+  const buf = out.toJPEG(82);
+  if (!buf || buf.length < 512) throw new Error('the image could not be encoded');
+  fs.writeFileSync(shotFile(key), buf);
+  return buf.length;
+}
+// Plugindex keeps its captures in ~/.plugindex/images as "vendor~product-name.png";
+// the product part maps onto our own key, so those pictures show up here too.
+// Only files newer than the last import are read, so a picture the user deleted stays deleted.
+const PIDX = path.join(os.homedir(), '.plugindex', 'images'), PIDX_MARK = path.join(SHOTS, '.plugindex-import');
+async function importPlugindex() {
+  let since = 0, files = [];
+  try { since = +fs.readFileSync(PIDX_MARK, 'utf8') || 0; } catch {}
+  try { files = fs.readdirSync(PIDX).filter(f => /~.+\.(png|jpe?g|webp)$/i.test(f)); } catch { return 0; }
+  let n = 0;
+  for (const f of files) {
+    const p = path.join(PIDX, f);
+    try {
+      if (fs.statSync(p).mtimeMs <= since) continue;
+      const key = shotKey(f.split('~').slice(1).join('~').replace(/\.[^.]+$/, '').replace(/-/g, ' '));
+      if (fs.existsSync(shotFile(key))) continue;
+      const img = nativeImage.createFromPath(p);
+      if (!img.isEmpty()) { writeShot(key, img); n++; }
+    } catch {}
+    await new Promise(r => setImmediate(r)); // keep the window responsive on the first big import
+  }
+  try { fs.writeFileSync(PIDX_MARK, String(Date.now())); } catch {}
+  return n;
+}
+let pidxDone = null;
+ipcMain.handle('shots', async () => { await (pidxDone = pidxDone || importPlugindex()); const files = shotIndex(); return { dir: SHOTS, files, dims: shotDims(files) }; });
+ipcMain.handle('shotSave', (_, key, dataUrl) => {
+  if (!shotSafe(key)) throw new Error('bad artwork key');
+  return { bytes: writeShot(key, nativeImage.createFromDataURL(dataUrl)), files: shotIndex() };
+});
+ipcMain.handle('shotPick', async (_, key) => {
+  if (!shotSafe(key)) return null;
+  const r = await dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }] });
+  if (r.canceled || !r.filePaths[0]) return null;
+  const img = nativeImage.createFromPath(r.filePaths[0]);
+  if (!img || img.isEmpty()) return { error: 'that file is not an image Rummage can read' };
+  return { bytes: writeShot(key, img), files: shotIndex() };
+});
+ipcMain.handle('shotDelete', (_, key) => {
+  if (shotSafe(key)) try { fs.unlinkSync(shotFile(key)); } catch {}
+  return shotIndex();
+});
+
+// ---------- batch artwork: every VST3 opened on its own, unseen, and photographed ----------
+const SNAP = app.isPackaged ? path.join(process.resourcesPath, 'vst3snap.exe') : path.join(__dirname, 'native', 'vst3snap.exe');
+const SNAP_FAILED = path.join(SHOTS, '.failed.json');
+const snapRun = (args, ms) => new Promise(r => execFile(SNAP, args, { timeout: ms, windowsHide: true, maxBuffer: 1 << 20 }, (e, out) => r({ ok: !e, out: String(out || '') })));
+let snapStop = false, snapBusy = false;
+ipcMain.on('shotStop', () => { snapStop = true; });
+// list: [{ key, name, path, fmt }] of plugins with no artwork yet
+ipcMain.handle('shotScan', async (e, list, retry) => {
+  if (snapBusy || !fs.existsSync(SNAP)) return { error: snapBusy ? 'already capturing' : 'the capture helper is missing' };
+  snapBusy = true; snapStop = false;
+  try { // an unexpected error must not leave capture locked until restart
+  let failed = {}; try { failed = retry ? {} : JSON.parse(fs.readFileSync(SNAP_FAILED, 'utf8')); } catch {}
+  // Waves plugins live inside WaveShells, and each shell version holds a different set: ask them all
+  const shells = paths().vst3.flatMap(d => { try { return fs.readdirSync(d).filter(f => /^waveshell\d?-vst3 [\d.]+_x64\.vst3$/i.test(f)).map(f => path.join(d, f)); } catch { return []; } }).sort().reverse();
+  const wavesClass = new Map(), rank = n => /mono\/stereo$/i.test(n) ? 1 : /stereo$/i.test(n) ? 2 : 0;
+  if (list.some(i => i.fmt === 'Waves')) for (const sh of shells) {
+    const r = await snapRun([sh, '--list'], 60000);
+    for (const n of r.out.split(/\r?\n/).map(x => x.trim()).filter(Boolean)) { const k = pkey(n), o = wavesClass.get(k); if (!o || rank(n) > rank(o.name)) wavesClass.set(k, { shell: sh, name: n }); }
+  }
+  const jobs = list.filter(i => shotSafe(i.key) && !failed[i.key] && !fs.existsSync(shotFile(i.key))).map(i => {
+    const k = pkey(i.name);
+    // a Waves bundle like "API-550" holds "API-550A" and "API-550B": take the first that starts with its name
+    const w = wavesClass.get(k) || (i.fmt === 'Waves' && k.length > 3 ? [...wavesClass].find(([c]) => c.startsWith(k))?.[1] : null);
+    return i.fmt === 'VST3' && i.path ? { ...i, args: [i.path] } : w ? { ...i, args: [w.shell, null, w.name] } : null;
+  }).filter(Boolean);
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rummage-snap-'));
+  let done = 0, got = 0;
+  const total = jobs.length;
+  const send = (it, ok) => { try { e.sender.send('shotProgress', { done, total, got, name: it && it.name, key: ok ? it.key : '', dim: ok ? jpegSize(shotFile(it.key)) : null }); } catch {} };
+  send(null, false);
+  const worker = async () => {
+    while (jobs.length && !snapStop) {
+      const it = jobs.shift(), out = path.join(tmp, it.key + '.png'), args = it.args.slice();
+      args[1] = out;
+      const r = await snapRun(args, it.fmt === 'Waves' ? 45000 : 25000);
+      let ok = false;
+      try { if (r.ok && fs.existsSync(out)) { writeShot(it.key, nativeImage.createFromPath(out)); ok = true; got++; } } catch {}
+      if (!ok) failed[it.key] = 1;
+      try { fs.unlinkSync(out); } catch {}
+      done++; send(it, ok);
+    }
+  };
+  // shortcut: 3 plug-ins at once keeps CPU sane; heavy samplers can still take ~20 s each
+  await Promise.all([worker(), worker(), worker()]);
+  try { fs.writeFileSync(SNAP_FAILED, JSON.stringify(failed)); } catch {}
+  try { fs.rmSync(tmp, { recursive: true, force: true }); } catch {}
+  return { total, got, stopped: snapStop, files: shotIndex() };
+  } finally { snapBusy = false; }
+});
+
+// the running host's processes and its main window, so plugin editors can be told apart
+const HOSTPROC = { fl: ['FL64', 'FL'], live: ['Ableton Live*'] };
+async function hostScope(host) {
+  const pids = await shots.pidsFor(HOSTPROC[host] || HOSTPROC.fl);
+  if (!pids.length) return null;
+  const ws = await shots.listWindows();
+  const mine = ws.filter(w => pids.includes(Number(w.pid)));
+  const main = mine.slice().sort((a, b) => (b.w * b.hh) - (a.w * a.hh))[0];
+  return { pids, mainHandle: main ? main.h : 0 };
+}
+
+// One capture job at a time; every step reports back so the UI can show progress.
+const cap = { running: false, stop: false, done: 0, total: 0, current: '', error: '', failed: [] };
+const capSend = (win, extra = {}) => {
+  if (win && !win.isDestroyed()) win.webContents.send('cap', {
+    running: cap.running, done: cap.done, total: cap.total, current: cap.current,
+    error: cap.error, failed: cap.failed.length, ...extra,
+  });
+};
+
+// grabs one editor window into shots/<key>.jpg, returns false when there is nothing usable
+async function grab(handle, key) {
+  const png = path.join(os.tmpdir(), 'rummage-shot-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7) + '.png');
+  try {
+    const r = await shots.captureWindow(handle, png);
+    if (!r || !r.ok) return false;
+    const img = nativeImage.createFromPath(png);
+    if (!img || img.isEmpty()) return false;
+    writeShot(key, img);
+    return true;
+  } finally { try { fs.unlinkSync(png); } catch {} }
+}
+
+ipcMain.handle('capStart', async (e, host, list, opts = {}) => {
+  if (cap.running) return { ok: false, error: 'a capture is already running' };
+  const win = BrowserWindow.fromWebContents(e.sender);
+  const scope = await hostScope(host);
+  if (!scope) return { ok: false, error: host === 'fl' ? 'FL Studio is not running' : 'Ableton Live is not running' };
+  cap.running = true; cap.stop = false; cap.done = 0; cap.total = list.length; cap.current = ''; cap.error = ''; cap.failed = [];
+  capSend(win);
+  (async () => {
+    for (const it of list) {
+      if (cap.stop) break;
+      cap.current = it.name || '';
+      capSend(win);
+      let editor = null;
+      try {
+        const before = await shots.listWindows();
+        const known = new Set(before.map(w => w.h));
+        // ask the host to open this plugin
+        if (host === 'fl' && it.fst) shell.openPath(it.fst);
+        else if (host === 'live') { sendToLive(it.name || '', true); }
+        else throw new Error('no way to open this plugin');
+        await shots.sleep(opts.settle || 900);
+        editor = await shots.waitForPluginWindow({
+          pids: scope.pids, exclude: [...known, scope.mainHandle],
+          minW: 200, minH: 120, timeout: opts.timeout || 12000, match: it.name || '',
+        });
+        if (!editor) throw new Error('the plugin window did not appear');
+        if (!(await grab(editor.h, it.key))) throw new Error('the window could not be captured');
+        cap.done++;
+      } catch (err) {
+        cap.error = (it.name || '') + ': ' + (err && err.message || err);
+        cap.failed.push({ id: it.id, key: it.key, error: String(err && err.message || err) });
+      } finally {
+        if (opts.cleanup !== false) {
+          try {
+            if (editor) { await shots.closeWindow(editor.h); await shots.sleep(350); }
+            await shots.sendKeys('^z'); // undo the channel/track the scan just added
+          } catch {}
+        }
+      }
+      capSend(win);
+    }
+    cap.running = false; cap.current = '';
+    capSend(win, { state: 'done' });
+  })().catch(err => { cap.running = false; cap.error = String(err && err.message || err); capSend(win, { state: 'done' }); });
+  return { ok: true, total: list.length };
+});
+
+ipcMain.handle('capStop', () => { cap.stop = true; return { ok: true }; });
+
+// manual: capture whichever plugin editor is in front right now
+ipcMain.handle('capSnap', async (e, host, key, name) => {
+  if (!shotSafe(key)) return { ok: false, error: 'bad key' };
+  const scope = await hostScope(host);
+  if (!scope) return { ok: false, error: host === 'fl' ? 'FL Studio is not running' : 'Ableton Live is not running' };
+  const w = await shots.newestPluginWindow({ pids: scope.pids, exclude: [scope.mainHandle], match: name || '', minW: 200, minH: 120 });
+  if (!w) return { ok: false, error: 'no plugin window found — open the plugin first' };
+  const ok = await grab(w.h, key);
+  return ok ? { ok: true, files: shotIndex() } : { ok: false, error: 'the window could not be captured' };
+});
+
+function sendToLive(name, enter) {
   clipboard.writeText(name);
   const ps = `Add-Type -AssemblyName Microsoft.VisualBasic,System.Windows.Forms
 $p = Get-Process | ? { $_.MainWindowTitle -like '*Ableton Live*' } | select -First 1
 if ($p) { [Microsoft.VisualBasic.Interaction]::AppActivate($p.Id); Start-Sleep -m 350
-[System.Windows.Forms.SendKeys]::SendWait('^f'); Start-Sleep -m 200; [System.Windows.Forms.SendKeys]::SendWait('^v') }`;
+[System.Windows.Forms.SendKeys]::SendWait('^f'); Start-Sleep -m 200; [System.Windows.Forms.SendKeys]::SendWait('^v')${enter ? "; Start-Sleep -m 500; [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')" : ''} }`;
   exec('powershell -NoProfile -EncodedCommand ' + Buffer.from(ps, 'utf16le').toString('base64'));
 }
 
@@ -312,22 +551,36 @@ ipcMain.handle('pathReset', (_, key) => { db.paths = { ...paths(), [key]: DEFAUL
 // kept for the "add folder" shortcuts: they edit the sample locations
 ipcMain.handle('addFolder', async () => { const r =await dialog.showOpenDialog({ properties: ['openDirectory'] }); if (r.canceled) return null; const s = paths().samples; if (!s.includes(r.filePaths[0])) db.paths = { ...paths(), samples: [...s, r.filePaths[0]] }; saveDb(); return paths().samples; });
 ipcMain.handle('rmFolder', (_, f) => { db.paths = { ...paths(), samples: paths().samples.filter(x => x !== f) }; saveDb(); return paths().samples; });
-// dock: Rummage on the left of the screen, the host DAW's window filling the rest on the right
-function dockHost(host, w) {
+// which screen edge Rummage sits on: the half of the display its centre is in
+function sideOf(w) {
+  const { screen } = require('electron');
+  const b = w.getBounds(), wa = screen.getDisplayMatching(b).workArea;
+  return b.x + b.width / 2 > wa.x + wa.width / 2 ? 'right' : 'left';
+}
+// Windows 11 draws a 1px light border and rounded corners round every window; both leave a visible
+// seam when Rummage is flush against the screen edge or the DAW, so turn them off for this window
+function flushChrome(w) {
+  const hwnd = w.getNativeWindowHandle().readBigUInt64LE(0).toString();
+  const ps = 'Add-Type @"\nusing System;using System.Runtime.InteropServices;\npublic class M{[DllImport("dwmapi.dll")]public static extern int DwmSetWindowAttribute(IntPtr h,int a,ref int v,int s);}\n"@\n'
+    + `$h=[IntPtr]${hwnd};$none=-2;$sq=1;[M]::DwmSetWindowAttribute($h,34,[ref]$none,4)|Out-Null;[M]::DwmSetWindowAttribute($h,33,[ref]$sq,4)|Out-Null`;
+  exec('powershell -NoProfile -EncodedCommand ' + Buffer.from(ps, 'utf16le').toString('base64'), () => {});
+}
+// dock: Rummage on one edge of the screen, the host DAW's window filling the rest
+function dockHost(host, w, side = sideOf(w)) {
   const { screen } = require('electron');
   const disp = screen.getDisplayMatching(w.getBounds()), wa = disp.workArea, sf = disp.scaleFactor;
-  const width = Math.min(w.getBounds().width, Math.round(wa.width * .4));
+  const width = Math.min(w.getBounds().width, Math.round(wa.width * .4)), right = side === 'right';
   if (w.isMaximized()) w.unmaximize();
-  w.setBounds({ x: wa.x, y: wa.y, width, height: wa.height });
+  w.setBounds({ x: right ? wa.x + wa.width - width : wa.x, y: wa.y, width, height: wa.height });
   // physical pixels; Windows windows have ~7px invisible borders on the sides and bottom
-  const X = Math.round((wa.x + width) * sf) - 7, Y = Math.round(wa.y * sf), W = Math.round((wa.width - width) * sf) + 14, H = Math.round(wa.height * sf) + 7;
+  const X = Math.round((right ? wa.x : wa.x + width) * sf) - 7, Y = Math.round(wa.y * sf), W = Math.round((wa.width - width) * sf) + 14, H = Math.round(wa.height * sf) + 7;
   const find = host === 'fl' ? 'Get-Process -Name FL64,FL -ErrorAction SilentlyContinue' : "Get-Process | ? { $_.ProcessName -like 'Ableton Live*' }";
   const ps = 'Add-Type @"\nusing System;using System.Runtime.InteropServices;\npublic class D{[DllImport("user32.dll")]public static extern bool ShowWindow(IntPtr h,int c);[DllImport("user32.dll")]public static extern bool SetWindowPos(IntPtr h,IntPtr a,int x,int y,int w,int ht,uint f);}\n"@\n'
     + `$p = ${find} | ? { $_.MainWindowHandle -ne 0 } | select -First 1\n`
     + `if ($p) { [D]::ShowWindow($p.MainWindowHandle, 9) | Out-Null; [D]::SetWindowPos($p.MainWindowHandle, [IntPtr]::Zero, ${X}, ${Y}, ${W}, ${H}, 0x0044) | Out-Null; 'docked' } else { 'none' }`;
   exec('powershell -NoProfile -EncodedCommand ' + Buffer.from(ps, 'utf16le').toString('base64'), (e, out) => { if (!w.isDestroyed()) w.webContents.send('docked', String(out || '').trim()); });
 }
-ipcMain.on('dock', (e, host) => dockHost(host, BrowserWindow.fromWebContents(e.sender)));
+ipcMain.on('dock', (e, host, side) => dockHost(host, BrowserWindow.fromWebContents(e.sender), side === 'left' || side === 'right' ? side : undefined));
 // FL Studio opens a plugin's .fst into the running project
 ipcMain.on('openFst', (_, p) => { if (/\.fst$/i.test(p)) shell.openPath(p); });
 ipcMain.handle('read', (_, p) => fs.promises.readFile(p));
@@ -335,6 +588,7 @@ ipcMain.on('drag', (e, p) => e.sender.startDrag({ file: p, icon: dragIcon }));
 ipcMain.on('live', (_, n) => sendToLive(n));
 ipcMain.on('reveal', (_, p) => shell.showItemInFolder(p));
 ipcMain.on('openRepo', () => shell.openExternal('https://github.com/mitoisgrowing/rummage'));
+ipcMain.on('openLoopMidi', () => shell.openExternal('https://www.tobias-erichsen.de/software/loopmidi.html'));
 // the native min/max/close buttons follow the theme's header colour and the interface size
 let tbColor = '#2a2a2a', tbScale = 1;
 const paintTitlebar = w => w.setTitleBarOverlay({ color: tbColor, symbolColor: '#bdbdbd', height: Math.round(32 * tbScale) });
@@ -342,7 +596,47 @@ ipcMain.on('zoom', (e, s) => { tbScale = s; e.sender.setZoomFactor(s); paintTitl
 ipcMain.on('titlebar', (e, c) => { tbColor = c; paintTitlebar(BrowserWindow.fromWebContents(e.sender)); });
 ipcMain.on('top',(e, v) => BrowserWindow.fromWebContents(e.sender).setAlwaysOnTop(v));
 
+// ---------- project previews: a few seconds of how each project sounds ----------
+const SNIPS = path.join(app.getPath('userData'), 'snips'), SNIPIDX = path.join(SNIPS, 'index.json');
+try { fs.mkdirSync(SNIPS, { recursive: true }); } catch {}
+const snipIdx = () => { try { return JSON.parse(fs.readFileSync(SNIPIDX, 'utf8')); } catch { return {}; } };
+// project path -> { f: file name, t: time recorded }
+ipcMain.handle('snips', () => ({ dir: SNIPS, map: snipIdx() }));
+ipcMain.handle('snipSave', (_, id, buf) => {
+  if (typeof id !== 'string' || !buf || buf.byteLength < 200 || buf.byteLength > 3e6) throw new Error('bad clip');
+  const idx = snipIdx(), f = crypto.createHash('sha1').update(id.toLowerCase()).digest('hex').slice(0, 16) + '.webm';
+  fs.writeFileSync(path.join(SNIPS, f), Buffer.from(buf));
+  idx[id] = { f, t: Date.now() }; fs.writeFileSync(SNIPIDX, JSON.stringify(idx));
+  return idx;
+});
+ipcMain.handle('snipDelete', (_, id) => { const idx = snipIdx(); if (idx[id]) { try { fs.unlinkSync(path.join(SNIPS, idx[id].f)); } catch {} delete idx[id]; fs.writeFileSync(SNIPIDX, JSON.stringify(idx)); } return idx; });
+// the open project's name is in the DAW's window title
+ipcMain.handle('dawTitle', (_, host) => new Promise(r => exec(`tasklist /v /fo csv /nh /fi "imagename eq ${host === 'live' ? 'Ableton*' : 'FL*'}"`, { windowsHide: true }, (e, out) => {
+  if (e) return r('');
+  const titles = String(out).split(/\r?\n/).map(l => (l.match(/"([^"]*)"\s*$/) || [])[1]).filter(t => t && t !== 'N/A' && /FL Studio|Ableton/i.test(t));
+  r(titles[0] || '');
+})));
+
+// the DAW link runs on Web MIDI (sysex over a loopMIDI port), which needs these two permissions
+const MIDI_OK = new Set(['midi', 'midiSysex']);
+// copies the DAW-side script where FL (Settings/Hardware) or Live (User Library/Remote Scripts) looks for it
+ipcMain.handle('dawScript', (_, host) => {
+  const base = app.isPackaged ? path.join(process.resourcesPath, 'daw') : path.join(__dirname, 'daw');
+  const live = host === 'live';
+  const src = live ? path.join(base, 'live', 'Rummage') : path.join(base, 'fl');
+  const dir = live ? path.join(docs, 'Ableton', 'User Library', 'Remote Scripts', 'Rummage') : path.join(paths().fl[0] || path.join(docs, 'Image-Line', 'FL Studio'), 'Settings', 'Hardware', 'Rummage');
+  fs.mkdirSync(dir, { recursive: true });
+  for (const f of fs.readdirSync(src)) fs.copyFileSync(path.join(src, f), path.join(dir, f));
+  return dir;
+});
 app.whenReady().then(async () => {
+  const { session } = require('electron');
+  session.defaultSession.setPermissionRequestHandler((wc, p, cb) => cb(MIDI_OK.has(p) || p === 'media'));
+  session.defaultSession.setPermissionCheckHandler((wc, p) => MIDI_OK.has(p) || p === 'media');
+  // project previews record what the computer is playing (Windows loopback), never the screen
+  session.defaultSession.setDisplayMediaRequestHandler((req, cb) => {
+    require('electron').desktopCapturer.getSources({ types: ['screen'] }).then(s => cb({ video: s[0], audio: 'loopback' })).catch(() => cb({}));
+  });
   const wa = require('electron').screen.getPrimaryDisplay().workArea;
   const w = new BrowserWindow({
     x: wa.x, y: wa.y, width: 480, height: wa.height, minWidth: 300, alwaysOnTop: true,
@@ -351,6 +645,9 @@ app.whenReady().then(async () => {
     webPreferences: { preload: path.join(__dirname, 'preload.js') },
   });
   w.loadFile('index.html');
+  w.once('ready-to-show', () => flushChrome(w));
+  w.webContents.on('did-finish-load', () => { flushChrome(w); w.webContents.send('side', sideOf(w)); });
+  w.on('moved', () => w.webContents.send('side', sideOf(w)));
   setInterval(() => exec('tasklist /fo csv /nh', (e, out) => { if (!e && !w.isDestroyed()) w.webContents.send('daws', { live: /Ableton Live/i.test(out), fl: /"FL(64)?\.exe"/i.test(out) }); }), 4000);
   watch(w);
   ipcMain.on('rewatch', () => watch(w));
